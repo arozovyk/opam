@@ -226,11 +226,12 @@ let yaml_of_with_entry = function
 | Literal entries -> "|\n          " ^ String.concat "\n          " entries
 | Expression expr -> Printf.sprintf "${{ %s }}" expr
 
-let uses name ?id ?cond ?(continue_on_error=false) ?(withs=[]) action ~oc ~workflow ~job f =
+let uses name ?id ?cond ?env ?(continue_on_error=false) ?(withs=[]) action ~oc ~workflow ~job f =
   fprintf oc "    - name: %s\n" name;
   Option.iter (fprintf oc "      id: %s\n") id;
   emit_condition ~oc ~indent:6 cond;
   fprintf oc "      uses: %s\n" action;
+  Option.iter (emit_env ~indent:6 ~oc) env;
   if continue_on_error then
     output_string oc "      continue-on-error: true\n";
   if withs <> [] then begin
