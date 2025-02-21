@@ -113,6 +113,24 @@ users)
 ### Engine
 
 ## Github Actions
+  * Add a doc generation job under linux [#5349 @rjbou]
+  * Update the github action scripts now that homebrew renamed the GNU patch binary to gpatch [#6296 @kit-ty-kate]
+  * Add branch scheme `username/branch` for opam-rt specific branch to use [#6274 @rjbou]
+  * Check `shell/install.sh` using `shellcheck` [#6313 @kit-ty-kate]
+  * Fix the alpine depexts test [#6363 @kit-ty-kate]
+  * Speedup the gentoo depexts test [#6363 @kit-ty-kate]
+  * Add OCaml 5.3 to the build matrix [#6192 @kit-ty-kate]
+  * Add OCaml 5.3/MSVC to the build matrix [#6192 @kit-ty-kate]
+  * Add a test making sure `opam init` works in the absence of `OPAMROOT` [#5663 @kit-ty-kate]
+  * Show Cygwin version info after loading it from the cache [#6383 @kit-ty-kate]
+  * Upgrade the opam version used to setup the depexts workflows to 2.3.0 [#6444 @kit-ty-kate]
+  * Enable the depexts workflow on master and when the opam description change [#6447 @kit-ty-kate]
+  * Make depext generate action script pass spellcheck [#6471 @kit-ty-kate]
+  * Add depext generate action script to spellcheck check action [#6471 @kit-ty-kate]
+  * Some cleaning in depext generate action and instruction for local testing [#6471 @rjbou]
+  * Cache the repository and a minimal one in docker image for depext jobs [#6471 @rjbou]
+  * Use the good opam binary in depext jobs [#6471 @RyanGibb]
+  * Add a job that test plugins compilation in order to keep them synchroniser [#6394 @rjbou]
 
 ## Doc
 
