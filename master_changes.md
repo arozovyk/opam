@@ -236,6 +236,7 @@ users)
   * Some cleaning in depext generate action and instruction for local testing [#6471 @rjbou]
   * Cache the repository and a minimal one in docker image for depext jobs [#6471 @rjbou]
   * Use the good opam binary in depext jobs [#6471 @RyanGibb]
+  * Add a job that test plugins compilation in order to keep them synchroniser [#6394 @rjbou]
 
 ## Doc
   * Update the command to install opam to point to the new simplified url on opam.ocaml.org [#6226 @kit-ty-kate]
