@@ -1592,28 +1592,28 @@ let subpath ?section cli =
 let package_selection_section = "PACKAGE SELECTION OPTIONS"
 let order_sensible_selector_section = "ORDER-SENSIBLE SELECTORS"
 
-let post ?(section=package_selection_section) cli =
+let post ?(section=order_sensible_selector_section) cli =
   mk_flag ~cli cli_original ["post"]  ~section
     "Include dependencies tagged as $(i,post)."
 
-let dev ?(section=package_selection_section) cli =
+let dev ?(section=order_sensible_selector_section) cli =
   mk_flag ~cli cli_original ["dev"]  ~section
     "Include development packages in dependencies."
 
-let doc_flag ?(section=package_selection_section) cli =
+let doc_flag ?(section=order_sensible_selector_section) cli =
   mk_flag ~cli cli_original ["doc";"with-doc"] ~section
     "Include doc-only dependencies."
 
-let test ?(section=package_selection_section) cli =
+let test ?(section=order_sensible_selector_section) cli =
   mk_flag ~cli cli_original ["t";"test";"with-test"] ~section
     "Include test-only dependencies."
 
-let dev_setup ?(section=package_selection_section) cli =
+let dev_setup ?(section=order_sensible_selector_section) cli =
   mk_flag ~cli (cli_from cli2_2) ["with-dev-setup"] ~section
     "Include developer only dependencies."
 
 let package_selection ?(admin=false) cli =
-  let section = package_selection_section in
+  let section = order_sensible_selector_section in
   let depends_on =
     mk_opt_all ~cli cli_original ["depends-on"] "PACKAGES" ~section
       "List only packages that depend on one of (comma-separated) $(b,PACKAGES)."
