@@ -580,8 +580,8 @@ let list ?(force_search=false) cli =
       "Package patterns with globs. Unless $(b,--search) is specified, they \
        match againsta $(b,NAME) or $(b,NAME.VERSION)"
       Arg.string
-  in
-  let state_selector =
+  in(* 
+  let (state_selector : OpamListCommand.selector disjunction Term.t ) =
     mk_vflag_all ~cli ~section:OpamArg.order_sensible_selector_section [
         cli_original, OpamListCommand.Any, ["A";"all"],
           "Include all, even uninstalled or unavailable packages";
@@ -610,7 +610,7 @@ let list ?(force_search=false) cli =
         cli_original, OpamListCommand.Pinned, ["pinned"],
           "List only the pinned packages";
       ]
-  in
+  in *)
   let section = selection_docs in
   let search =
     if force_search then Term.const true else
@@ -671,7 +671,7 @@ let list ?(force_search=false) cli =
        system dependency."
   in
   let list
-      global_options selection state_selector no_switch depexts vars repos
+      global_options selection   no_switch depexts vars repos
       owns_file disjunction search silent no_depexts format packages () =
     apply_global_options cli global_options;
     let no_switch =
@@ -679,7 +679,7 @@ let list ?(force_search=false) cli =
     in
     let format =
       let force_all_versions =
-        not search && state_selector = [] && match packages with
+        not search (* && state_selector = [] *) && match packages with
         | [single] ->
           let nameglob =
             match OpamStd.String.cut_at single '.' with
@@ -695,15 +695,15 @@ let list ?(force_search=false) cli =
     let join =
       if disjunction then OpamFormula.ors else OpamFormula.ands
     in
-    let state_selector =
+   (*  let state_selector =
       if state_selector = [] then
         if no_switch || search || owns_file <> None then Empty
-        else if packages = [] && selection = []
+        else if packages = [] && selection = ([])
         then Atom OpamListCommand.Installed
         else Or (Atom OpamListCommand.Installed,
                  Atom OpamListCommand.Available)
       else join (List.map (fun x -> Atom x) state_selector)
-    in
+    in *)
     let pattern_selector =
       if search then
         join
@@ -723,7 +723,7 @@ let list ?(force_search=false) cli =
              ((owns_file >>| fun f -> Atom (OpamListCommand.Owns_file f)) +!
               Empty) ::
            List.map (fun x -> Atom x) selection);
-        state_selector;
+           (* state_selector; *)
       ]
     in
     OpamGlobalState.with_ `Lock_none @@ fun gt ->
@@ -751,8 +751,8 @@ let list ?(force_search=false) cli =
     let results =
       OpamListCommand.filter ~base:all st filter
     in
-    if not no_depexts && not silent &&
-       OpamFormula.exists OpamListCommand.uses_depexts state_selector then
+    if not no_depexts && not silent (* &&
+       OpamFormula.exists OpamListCommand.uses_depexts state_selector  *)then
       (let drop_by_depexts =
          List.fold_left (fun missing str ->
              let is_missing pkgs =
@@ -797,10 +797,10 @@ let list ?(force_search=false) cli =
     else if OpamSysPkg.Set.is_empty results_depexts then
       OpamStd.Sys.exit_because `False
   in
-  mk_command  ~cli cli_original "list" ~doc ~man
-    Term.(const list $global_options cli $package_selection cli $state_selector
-          $no_switch $depexts $vars $repos $owns_file $disjunction $search
-          $silent $no_depexts $package_listing cli $pattern_list)
+  let term = Term.(const list $global_options cli $package_selection cli 
+  $no_switch $depexts $vars $repos $owns_file $disjunction $search
+  $silent $no_depexts $package_listing cli $pattern_list) in 
+  mk_command  ~cli cli_original "list" ~doc ~man term
 
 (* TREE *)
 let tree_doc = "Draw the dependency forest of installed packages."

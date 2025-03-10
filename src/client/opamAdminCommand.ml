@@ -1159,7 +1159,7 @@ let list_command cli =
     OpamListCommand.display st format results
   in
   OpamArg.mk_command  ~cli OpamArg.cli_original command ~doc ~man
-  Term.(const cmd $ global_options cli $ OpamArg.package_selection cli $
+  Term.(const cmd $ global_options cli $ OpamArg.package_selection ~admin:true cli $
         or_arg cli $ state_selection_arg cli $ OpamArg.package_listing cli $
         env_arg cli $ pattern_list_arg)
 
@@ -1246,7 +1246,7 @@ let filter_command cli =
       pkg_prefixes
   in
   OpamArg.mk_command  ~cli OpamArg.cli_original command ~doc ~man
-  Term.(const cmd $ global_options cli $ OpamArg.package_selection cli $
+  Term.(const cmd $ global_options cli $ OpamArg.package_selection ~admin:true cli $
         or_arg cli $ state_selection_arg cli $ env_arg cli $ remove_arg $
         dryrun_arg $
         pattern_list_arg)

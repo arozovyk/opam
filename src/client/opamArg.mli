@@ -233,7 +233,7 @@ val test: ?section:string -> OpamCLIVersion.Sourced.t -> bool Term.t
 val dev_setup: ?section:string -> OpamCLIVersion.Sourced.t -> bool Term.t
 
 (** Build a package selection filter *)
-val package_selection: OpamCLIVersion.Sourced.t -> OpamListCommand.selector list Term.t
+val package_selection: ?admin:bool -> OpamCLIVersion.Sourced.t -> OpamListCommand.selector list Term.t
 
 (** Man section name *)
 val package_listing_section: string
