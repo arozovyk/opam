@@ -485,20 +485,17 @@ let mk_vflag_all ~cli ~section ?(default=[]) flags =
   term_cli_check ~check Arg.(vflag_all default info_flags)
 
 let mk_opt_vflag_all ~cli ~section ?(default_vflag=[]) ?(default_opt=[])
-    (flags: (validity * ('a , 'b Cmdliner.Arg.conv) Arg.opt_or_vflag_arg * string list * string) list) 
-  :('a, 'b) Cmdliner.Arg.opt_or_vflag list Term.t
+    (flags:(validity * 'a * (('b -> 'a) * 'b Arg.conv) option * string list* string ) list ) 
   =
   let info_flags =
-    List.map (fun (validity,c, flag, doc) ->
-        let doc = update_doc_w_cli doc ~cli validity in
-        c, Arg.info ~docs:section flag ~doc)
-      flags
-  in
-  let default_vflag = List.map (fun x -> (  Arg.Vflag_res x)) default_vflag in
-  let default_opt = List.map (fun x ->  x) default_opt in
-  let check elems = `Ok elems in 
-  let opt_vflag_all = Arg.(opt_vflag_all default_vflag default_opt info_flags) in 
-  term_cli_check ~check  opt_vflag_all
+    List.map (fun (validity,c_f, conv_opt, flag, doc) ->
+         let doc = update_doc_w_cli doc ~cli validity in
+        c_f,(conv_opt), Arg.info ~docs:section flag ~doc)  flags
+  in 
+  let check elems =Printf.printf "term is ok \n"; `Ok elems in 
+  let opt_vflag_all   =
+   Arg.(opt_vflag_all2 default_vflag default_opt info_flags) in 
+  term_cli_check ~check opt_vflag_all
 
 let string_of_enum enum =
   Arg.doc_alts_enum (List.map (fun (_, s, v) -> s,v) enum)

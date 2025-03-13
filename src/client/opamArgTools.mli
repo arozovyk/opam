@@ -57,10 +57,13 @@ val mk_vflag_all:
   cli:OpamCLIVersion.Sourced.t -> section:string -> ?default:'a list ->
   (validity * 'a * string list * string) list -> 'a list Term.t
 
-val mk_opt_vflag_all : 
-cli:OpamCLIVersion.Sourced.t -> section:string -> ?default_vflag:'a list ->
-  ?default_opt:'b list -> (validity * ('a, 'b Arg.conv) Arg.opt_or_vflag_arg *
-   string list * string) list -> ('a, 'b) Arg.opt_or_vflag list Term.t
+val mk_opt_vflag_all : cli:OpamCLIVersion.Sourced.t ->
+  section:string ->
+  ?default_vflag:'a list ->
+  ?default_opt:'b list ->
+  (validity * 'a * (('b -> 'a) * 'b Cmdliner.Arg.conv) option * string list *
+   string)
+  list -> 'a list Term.t
 
 val mk_enum_opt:
   cli:OpamCLIVersion.Sourced.t -> validity -> section:string -> string list ->
