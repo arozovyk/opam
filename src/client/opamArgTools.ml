@@ -485,17 +485,16 @@ let mk_vflag_all ~cli ~section ?(default=[]) flags =
   term_cli_check ~check Arg.(vflag_all default info_flags)
 
 let mk_opt_vflag_all ~cli ~section ?(default_vflag=[]) ?(default_opt=[])
-    (flags: (validity * ('a , 'b Cmdliner.Arg.conv) Arg.opt_or_vflag * string list * string) list) 
-    :('a, 'b) Cmdliner.Arg.res list Term.t
-    =
+    (flags: (validity * ('a , 'b Cmdliner.Arg.conv) Arg.opt_or_vflag_arg * string list * string) list) 
+  :('a, 'b) Cmdliner.Arg.opt_or_vflag list Term.t
+  =
   let info_flags =
     List.map (fun (validity,c, flag, doc) ->
         let doc = update_doc_w_cli doc ~cli validity in
-        (* TODO include value for Arg.info *)
-       c, Arg.info ~docs:section flag ~doc)
+        c, Arg.info ~docs:section flag ~doc)
       flags
   in
-  let default_vflag = List.map (fun x ->   (  Arg.Vflag_res x)) default_vflag in
+  let default_vflag = List.map (fun x -> (  Arg.Vflag_res x)) default_vflag in
   let default_opt = List.map (fun x ->  x) default_opt in
   let check elems = `Ok elems in 
   let opt_vflag_all = Arg.(opt_vflag_all default_vflag default_opt info_flags) in 
