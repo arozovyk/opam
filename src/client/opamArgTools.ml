@@ -491,6 +491,7 @@ let mk_opt_vflag_all ~cli ~section ?(default_vflag=[]) ?(default_opt=[])
   let info_flags =
     List.map (fun (validity,c, flag, doc) ->
         let doc = update_doc_w_cli doc ~cli validity in
+        (* TODO include value for Arg.info *)
        c, Arg.info ~docs:section flag ~doc)
       flags
   in
