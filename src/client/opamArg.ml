@@ -1592,28 +1592,29 @@ let subpath ?section cli =
 let package_selection_section = "PACKAGE SELECTION OPTIONS"
 let order_sensible_selector_section = "ORDER-SENSIBLE SELECTORS"
 
-let post ?(section=order_sensible_selector_section) cli =
+let post ?(section=package_selection_section) cli =
   mk_flag ~cli cli_original ["post"]  ~section
     "Include dependencies tagged as $(i,post)."
 
-let dev ?(section=order_sensible_selector_section) cli =
+let dev ?(section=package_selection_section) cli =
   mk_flag ~cli cli_original ["dev"]  ~section
     "Include development packages in dependencies."
 
-let doc_flag ?(section=order_sensible_selector_section) cli =
+let doc_flag ?(section=package_selection_section) cli =
   mk_flag ~cli cli_original ["doc";"with-doc"] ~section
     "Include doc-only dependencies."
 
-let test ?(section=order_sensible_selector_section) cli =
+let test ?(section=package_selection_section) cli =
   mk_flag ~cli cli_original ["t";"test";"with-test"] ~section
     "Include test-only dependencies."
 
-let dev_setup ?(section=order_sensible_selector_section) cli =
+let dev_setup ?(section=package_selection_section) cli =
   mk_flag ~cli (cli_from cli2_2) ["with-dev-setup"] ~section
     "Include developer only dependencies."
 
-let package_selection ?(admin=false) cli =
-  let section = order_sensible_selector_section in
+let package_selection  ?admin cli =
+  ignore admin;
+  let section = package_selection_section in
   let depends_on =
     mk_opt_all ~cli cli_original ["depends-on"] "PACKAGES" ~section
       "List only packages that depend on one of (comma-separated) $(b,PACKAGES)."
@@ -1651,6 +1652,24 @@ let package_selection ?(admin=false) cli =
        currently pinned packages, architecture, and compiler version. \
        The combination with `--depopts' is not supported."
       Arg.(list atom)
+  in
+  let _combined_selector = 
+    mk_opt_vflag_all ~cli ~section:order_sensible_selector_section 
+    [
+      cli_original, Arg.Opt Arg.(list atom),  ["depends-on"],
+      "List only packages that depend on one of (comma-separated) $(b,PACKAGES).";
+      cli_from cli2_3, Arg.Vflag OpamListCommand.Latests_only, ["latests-only"],
+      "List only the latest version of each package.";
+
+      cli_original, Arg.Opt 
+      Arg.(list 
+      (* FIXME Type package is not compatible with type atom*)
+      (Obj.magic package_with_version)), ["conflicts-with"],
+      "List packages that have declared conflicts with at least one of the \
+      given list. This includes conflicts defined from the packages in the \
+      list, from the other package, or by a common $(b,conflict-class:) \
+      field.";
+    ]
   in
   let recursive =
     mk_flag ~cli cli_original ["recursive"] ~section
@@ -1690,40 +1709,11 @@ let package_selection ?(admin=false) cli =
       "Only includes packages which have the given tag set"
       Arg.string
   in
-
-  let state_selector =
-    mk_vflag_all ~cli ~section:order_sensible_selector_section [
-      cli_original, OpamListCommand.Any, ["A";"all"],
-      "Include all, even uninstalled or unavailable packages";
-      cli_original, OpamListCommand.Installed, ["i";"installed"],
-      "List installed packages only. This is the default when no \
-       further arguments are supplied";
-      cli_original, OpamListCommand.Root, ["roots";"installed-roots"],
-      "List only packages that were explicitly installed, excluding \
-       the ones installed as dependencies";
-      cli_original, OpamListCommand.Available, ["a";"available"],
-      "List only packages that are available on the current system";
-      cli_original, OpamListCommand.Installable, ["installable"],
-      "List only packages that can be installed on the current switch \
-       (this calls the solver and may be more costly; a package \
-       depending on an unavailable package may be available, but is \
-       never installable)";
-      cli_between cli2_0 cli2_1 ~replaced:"--invariant",
-      OpamListCommand.Compiler, ["base"],
-      "List only the immutable base of the current switch (i.e. \
-       compiler packages)";
-      cli_from cli2_3, OpamListCommand.Latests_only, ["latests-only"],
-      "List only the latest version of each package.";
-      cli_from cli2_2, OpamListCommand.Compiler, ["invariant"],
-      "List only the immutable base of the current switch (i.e. \
-       invariant packages)";
-      cli_original, OpamListCommand.Pinned, ["pinned"],
-      "List only the pinned packages";
-    ]
-  in
-  let filter0  depends_on required_by conflicts_with coinstallable_with resolve
+  let filter
+      depends_on required_by conflicts_with coinstallable_with resolve
       recursive depopts nobuild post dev doc_flag test dev_setup field_match
-      has_flag has_tag    = 
+      has_flag has_tag
+    =
     let dependency_toggles = {
       OpamListCommand.
       recursive; depopts; build = not nobuild; post; test; dev_setup;
@@ -1752,28 +1742,12 @@ let package_selection ?(admin=false) cli =
     List.map (fun pkgs ->
         OpamListCommand.Coinstallable_with (dependency_toggles, pkgs))
       coinstallable_with
-  in 
-  let filter state_selector
-      depends_on required_by conflicts_with coinstallable_with resolve
-      recursive depopts nobuild post dev doc_flag test dev_setup field_match
-      has_flag has_tag   =
-    state_selector @
-    ( filter0 depends_on required_by conflicts_with coinstallable_with resolve
-        recursive depopts nobuild post dev doc_flag test dev_setup field_match
-        has_flag has_tag )
   in
-
-  if admin then 
-    Term.(const filter0 $
-          depends_on $ required_by $ conflicts_with $ coinstallable_with $
-          resolve $ recursive $ depopts $ nobuild $ post cli $ dev cli $
-          doc_flag cli $ test cli $ dev_setup cli $ field_match $ has_flag $
-          has_tag  ) else
-    Term.(const filter $state_selector $depends_on $ required_by $ conflicts_with 
-          $ coinstallable_with $
-          resolve $ recursive $ depopts $ nobuild $ post cli $ dev cli $
-          doc_flag cli $ test cli $ dev_setup cli $ field_match $ has_flag $
-          has_tag  ) 
+  Term.(const filter $
+        depends_on $ required_by $ conflicts_with $ coinstallable_with $
+        resolve $ recursive $ depopts $ nobuild $ post cli $ dev cli $
+        doc_flag cli $ test cli $ dev_setup cli $ field_match $ has_flag $
+        has_tag)
 
 let package_listing_section = "OUTPUT FORMAT OPTIONS"
 
@@ -1826,33 +1800,33 @@ let package_listing cli =
       Arg.string " "
   in
   let format all_versions short sort columns normalise wrap separator =
-    fun ~force_all_versions ->
-      let all_versions = force_all_versions || all_versions in
-      let columns =
-        match columns with
-        | Some c -> c
-        | None ->
-          let cols =
-            if short then [OpamListCommand.Name]
-            else OpamListCommand.default_list_format
-          in
-          if all_versions then
-            List.map (function
-                | OpamListCommand.Name -> OpamListCommand.Package
-                | c -> c)
-              cols
-          else cols
-      in
-      { OpamListCommand.
-        short;
-        header = not short;
-        columns;
-        all_versions;
-        wrap = if wrap then Some (`Wrap "\\ ") else Some `Truncate;
-        separator;
-        value_printer = if normalise then `Normalised else `Normal;
-        order = if sort then `Dependency else `Standard;
-      }
+  fun ~force_all_versions ->
+    let all_versions = force_all_versions || all_versions in
+    let columns =
+      match columns with
+      | Some c -> c
+      | None ->
+        let cols =
+          if short then [OpamListCommand.Name]
+          else OpamListCommand.default_list_format
+        in
+        if all_versions then
+          List.map (function
+              | OpamListCommand.Name -> OpamListCommand.Package
+              | c -> c)
+            cols
+        else cols
+    in
+    { OpamListCommand.
+      short;
+      header = not short;
+      columns;
+      all_versions;
+      wrap = if wrap then Some (`Wrap "\\ ") else Some `Truncate;
+      separator;
+      value_printer = if normalise then `Normalised else `Normal;
+      order = if sort then `Dependency else `Standard;
+    }
   in
   Term.(const format $ all_versions $ print_short $ sort $ columns $ normalise $
         wrap $ separator)
