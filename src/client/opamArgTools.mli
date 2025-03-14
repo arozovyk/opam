@@ -62,7 +62,7 @@ val mk_opt_vflag_all : cli:OpamCLIVersion.Sourced.t ->
   ?default_vflag:'a list ->
   ?default_opt:'b list ->
   (validity * 'a * (('b -> 'a) * 'b Cmdliner.Arg.conv) option * string list *
-   string)
+   string * string option)
   list -> 'a list Term.t
 
 val mk_enum_opt:

@@ -1611,10 +1611,7 @@ let test ?(section=package_selection_section) cli =
 let dev_setup ?(section=package_selection_section) cli =
   mk_flag ~cli (cli_from cli2_2) ["with-dev-setup"] ~section
     "Include developer only dependencies."
-    type x = Atom of atom | Package of package
 
-
-let dependency_toggles_ref =ref  None 
 let package_selection  ?(admin=false) cli =
   let section = package_selection_section in
   let depends_on =
@@ -1656,48 +1653,56 @@ let package_selection  ?(admin=false) cli =
       Arg.(list atom)
   in
 
-  let combined_selector = 
+  let combined_selector =
+    let return = fun s (_) -> s in  
+    let dummy = return OpamListCommand.Any in 
     mk_opt_vflag_all ~cli ~section:order_sensible_selector_section 
       [
-        cli_original,   OpamListCommand.Any, None, ["A";"all"],
-        "Include all, even uninstalled or unavailable packages";
-        cli_original,   OpamListCommand.Installed, None, ["i";"installed"],
+        cli_original, (return OpamListCommand.Any), None, ["A";"all"],
+        "Include all, even uninstalled or unavailable packages", None;
+        cli_original,(return OpamListCommand.Installed), None,
+        ["i";"installed"],
         "List installed packages only. This is the default when no \
-         further arguments are supplied";
-        cli_original,   OpamListCommand.Root, None, ["roots";"installed-roots"],
+         further arguments are supplied", None;
+        cli_original, (return OpamListCommand.Root), None, 
+        ["roots";"installed-roots"],
         "List only packages that were explicitly installed, excluding \
-         the ones installed as dependencies";
-        cli_original,   OpamListCommand.Available, None, ["a";"available"],
-        "List only packages that are available on the current system";
-        cli_original,   OpamListCommand.Installable, None, ["installable"],
+         the ones installed as dependencies", None;
+        cli_original, (return OpamListCommand.Available), None, 
+        ["a";"available"],
+        "List only packages that are available on the current system", None;
+        cli_original, (return OpamListCommand.Installable), None,
+        ["installable"],
         "List only packages that can be installed on the current switch \
          (this calls the solver and may be more costly; a package \
          depending on an unavailable package may be available, but is \
-         never installable)";
+         never installable)", None;
         cli_between cli2_0 cli2_1 ~replaced:"--invariant",
-        OpamListCommand.Compiler, None, ["base"],
+        ( return OpamListCommand.Compiler), None, ["base"],
         "List only the immutable base of the current switch (i.e. \
-         compiler packages)";
-        cli_from cli2_3,   OpamListCommand.Latests_only, None, ["latests-only"],
-        "List only the latest version of each package.";
-        cli_from cli2_2,   OpamListCommand.Compiler, None, ["invariant"],
+         compiler packages)", None;
+        cli_from cli2_3, (return OpamListCommand.Latests_only), None, 
+        ["latests-only"],
+        "List only the latest version of each package.", None;
+        cli_from cli2_2, (return OpamListCommand.Compiler), None, 
+        ["invariant"],
         "List only the immutable base of the current switch (i.e. \
-         invariant packages)";
-        cli_original,   OpamListCommand.Pinned, None, ["pinned"],
-        "List only the pinned packages";
-        cli_original, OpamListCommand.Any, Some ((fun deps -> 
-          Printf.printf "Depends on ref is some %b" (Option.is_some !dependency_toggles_ref);
-            OpamListCommand.Depends_on (Option.get (!dependency_toggles_ref),deps)), 
-                                                 Arg.(list atom)), ["depends-on"],
-        "List only packages that depend on one of (comma-separated) $(b,PACKAGES).";
-        cli_original, OpamListCommand.Any, Some ((fun deps -> 
-
-            OpamListCommand.Required_by (Option.get (!dependency_toggles_ref),deps)),
-                                                 Arg.(list atom)), ["required-by"], 
-        "List only the dependencies of (comma-separated) $(b,PACKAGES).";
-        cli_original,OpamListCommand.Any, Some ((fun deps -> 
-            OpamListCommand.Solution (Option.get (!dependency_toggles_ref),deps)),
-                                                Arg.(list atom)), ["resolve"], 
+         invariant packages)", None;
+        cli_original, (return OpamListCommand.Pinned), None, ["pinned"],
+        "List only the pinned packages", None;
+        cli_original, dummy, Some ((fun deps dependency_toggles-> 
+            OpamListCommand.Depends_on(dependency_toggles,deps)),
+                                   Arg.(list atom)), ["depends-on"],
+        "List only packages that depend on one of (comma-separated)$(b,PACKAGES).",
+        Some "PACKAGES";
+        cli_original, dummy, Some ((fun deps dependency_toggles -> 
+            OpamListCommand.Required_by (dependency_toggles,deps)),
+                                   Arg.(list atom)), ["required-by"], 
+        "List only the dependencies of (comma-separated) $(b,PACKAGES).", 
+        Some "PACKAGES";
+        cli_original,dummy, Some ((fun deps  dependency_toggles-> 
+            OpamListCommand.Solution (dependency_toggles,deps)),
+                                  Arg.(list atom)), ["resolve"], 
         "Restrict to a solution to install (comma-separated) $(docv), $(i,i.e.) \
          a consistent set of packages including those. This is subtly different \
          from `--required-by --recursive`, which is more predictable and can't \
@@ -1708,13 +1713,14 @@ let package_selection  ?(admin=false) cli =
          set of currently installed packages. \
          `--no-switch` further makes the solution independent from the \
          currently pinned packages, architecture, and compiler version. \
-         The combination with `--depopts' is not supported.";
-        (* cli_original, OpamListCommand.Any, 
-             Some ((fun _ -> OpamListCommand.Any), Arg.(list package_with_version)),["conflicts-with"],
-              "List packages that have declared conflicts with at least one of the \
-              given list. This includes conflicts defined from the packages in the \
-              list, from the other package, or by a common $(b,conflict-class:) \
-              field.";  *) 
+         The combination with `--depopts' is not supported.", Some "PACKAGES";
+        (*  cli_original, (fun _ -> OpamListCommand.Any), 
+              Some ((fun p  _-> OpamListCommand.Conflicts_with p), 
+              Arg.(list package_with_version)),["conflicts-with"],
+               "List packages that have declared conflicts with at least one of the \
+               given list. This includes conflicts defined from the packages in the \
+               list, from the other package, or by a common $(b,conflict-class:) \
+               field.";   *) 
       ]
   in
   let recursive =
@@ -1793,17 +1799,15 @@ let package_selection  ?(admin=false) cli =
       coinstallable_with   recursive depopts nobuild post dev doc_flag 
       test dev_setup field_match has_flag has_tag =
 
-      Printf.printf "Filtering\n";
-
     let dependency_toggles = {
       OpamListCommand.
       recursive; depopts; build = not nobuild; post; test; dev_setup;
       doc = doc_flag; dev
     } in
-    dependency_toggles_ref:=Some dependency_toggles ; 
+    let combined_selector = List.map (fun cs-> cs dependency_toggles) combined_selector in
    ( filter0 [] [] conflicts_with coinstallable_with []
       recursive depopts nobuild post dev doc_flag test dev_setup field_match
-      has_flag has_tag) @    combined_selector 
+      has_flag has_tag) @ combined_selector 
   in
   if admin then 
     Term.(const filter0 $

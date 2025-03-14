@@ -485,16 +485,25 @@ let mk_vflag_all ~cli ~section ?(default=[]) flags =
   term_cli_check ~check Arg.(vflag_all default info_flags)
 
 let mk_opt_vflag_all ~cli ~section ?(default_vflag=[]) ?(default_opt=[])
-    (flags:(validity * 'a * (('b -> 'a) * 'b Arg.conv) option * string list* string ) list ) 
+    (flags:(validity * 'a * (('b -> 'a) * 'b Arg.conv) option * 
+            string list* string * string option ) list ) 
   =
   let info_flags =
-    List.map (fun (validity,c_f, conv_opt, flag, doc) ->
-         let doc = update_doc_w_cli doc ~cli validity in
-        c_f,(conv_opt), Arg.info ~docs:section flag ~doc)  flags
+    List.map (fun (validity,c_f, conv_opt, flag, doc,docv_opt) ->
+        let doc = update_doc_w_cli doc ~cli validity in
+        let info = match conv_opt with 
+          | Some _ -> 
+            let docv= match docv_opt with 
+                Some docv-> docv 
+              | None -> failwith "Missing docv for opt" in 
+            let info = Arg.info ~docs:section ~doc ~docv flag in 
+            info 
+          | None -> Arg.info ~docs:section ~doc flag in 
+        c_f,(conv_opt), info) flags
   in 
-  let check elems =Printf.printf "term is ok \n"; `Ok elems in 
+  let check elems =`Ok elems in 
   let opt_vflag_all   =
-   Arg.(opt_vflag_all2 default_vflag default_opt info_flags) in 
+    Arg.(opt_vflag_all default_vflag default_opt info_flags) in 
   term_cli_check ~check opt_vflag_all
 
 let string_of_enum enum =
