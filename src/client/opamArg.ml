@@ -1805,6 +1805,14 @@ let package_selection  ?(admin=false) cli =
       doc = doc_flag; dev
     } in
     let combined_selector = List.map (fun cs-> cs dependency_toggles) combined_selector in
+    
+    List.iter (fun selector -> 
+      match selector with 
+      OpamListCommand.Installed -> Printf.printf "Applying Installed\n" 
+      |OpamListCommand.Latests_only ->  Printf.printf "Applying Latests_only\n" 
+      |OpamListCommand.Depends_on _ ->  Printf.printf "Applying Depends_on\n" 
+      | _ -> ()) combined_selector ;
+
    ( filter0 [] [] conflicts_with coinstallable_with []
       recursive depopts nobuild post dev doc_flag test dev_setup field_match
       has_flag has_tag) @ combined_selector 
