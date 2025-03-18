@@ -1611,7 +1611,7 @@ let test ?(section=package_selection_section) cli =
 let dev_setup ?(section=package_selection_section) cli =
   mk_flag ~cli (cli_from cli2_2) ["with-dev-setup"] ~section
     "Include developer only dependencies."
-
+ type cmd = Command of atom conjunction
 let package_selection  ?(admin=false) cli =
   let section = package_selection_section in
   let depends_on =
@@ -1653,6 +1653,25 @@ let package_selection  ?(admin=false) cli =
       Arg.(list atom)
   in
 
+
+(*   let int_econv = Cmdliner.Arg.({ conv = (list(atom), fun x -> Command x)}) in 
+ *)   let combined_selector2  = 
+    mk_opt_vflag_all2 ~cli ~section:order_sensible_selector_section 
+      [
+        cli_original, (  OpamListCommand.Any), None, ["A";"all"],
+        "Include all, even uninstalled or unavailable packages", None;
+
+        cli_original,(OpamListCommand.Installed), None,
+        ["i";"installed"],
+        "List installed packages only. This is the default when no \
+         further arguments are supplied", None;
+
+        cli_original, OpamListCommand.Any, Some (None,Obj.magic () ) 
+        , ["required-by"], 
+        "List only the dependencies of (comma-separated) $(b,PACKAGES).", 
+        Some "PACKAGES";
+
+      ] in 
   let combined_selector =
     let return = fun s (_) -> s in  
     let dummy = return OpamListCommand.Any in 
