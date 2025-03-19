@@ -484,48 +484,28 @@ let mk_vflag_all ~cli ~section ?(default=[]) flags =
   let default = List.map (fun x -> Valid x) default in
   term_cli_check ~check Arg.(vflag_all default info_flags)
 
-let mk_opt_vflag_all ~cli ~section ?(default_vflag=[]) ?(default_opt=[])
-    (flags:(validity * 'a * (('b -> 'a) * 'b Arg.conv) option * 
-            string list* string * string option ) list ) 
+let mk_opt_vflag_all ~cli ~section ?(default=[]) 
+    (flags:(validity * 'a Arg.opt_or_vflag_arg * 
+            string list * string * string option ) list ) 
   =
   let info_flags =
-    List.map (fun (validity,c_f, conv_opt, flag, doc,docv_opt) ->
+    List.map (fun (validity,arg , flag, doc,docv_opt) ->
         let doc = update_doc_w_cli doc ~cli validity in
-        let info = match conv_opt with 
-          | Some _ -> 
+        let info = match arg with 
+          | Arg.Opt _ -> 
             let docv= match docv_opt with 
                 Some docv-> docv 
               | None -> failwith "Missing docv for opt" in 
             let info = Arg.info ~docs:section ~doc ~docv flag in 
             info 
-          | None -> Arg.info ~docs:section ~doc flag in 
-        c_f,(conv_opt), info) flags
+          | Arg.VFlag _ -> Arg.info ~docs:section ~doc flag in 
+          arg, info) flags
   in 
   let check elems =`Ok elems in 
   let opt_vflag_all   =
-     Arg.(opt_vflag_all default_vflag default_opt info_flags) in 
+     Arg.(opt_vflag_all default  info_flags) in 
   term_cli_check ~check opt_vflag_all
-let mk_opt_vflag_all2 ~cli ~section   ?(default =[])
-    (flags:(validity * 'a * ('b option * 'a Cmdliner.Arg.econv) option * 
-            string list* string * string option ) list ) 
-  =
-  let info_flags =
-    List.map (fun (validity,c_f, conv_opt, flag, doc,docv_opt) ->
-        let doc = update_doc_w_cli doc ~cli validity in
-        let info = match conv_opt with 
-          | Some _ -> 
-            let docv= match docv_opt with 
-                Some docv-> docv 
-              | None -> failwith "Missing docv for opt" in 
-            let info = Arg.info ~docs:section ~doc ~docv flag in 
-            info 
-          | None -> Arg.info ~docs:section ~doc flag in 
-        c_f,(conv_opt), info) flags
-  in 
-  let check elems =`Ok elems in 
-  let opt_vflag_all   =
-     Arg.(opt_vflag_all2 default info_flags) in 
-  term_cli_check ~check opt_vflag_all
+ 
 
 let string_of_enum enum =
   Arg.doc_alts_enum (List.map (fun (_, s, v) -> s,v) enum)
