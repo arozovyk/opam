@@ -505,7 +505,6 @@ let mk_opt_vflag_all ~cli ~section ?(default=[])
   let opt_vflag_all   =
      Arg.(opt_vflag_all default  info_flags) in 
   term_cli_check ~check opt_vflag_all
- 
 
 let string_of_enum enum =
   Arg.doc_alts_enum (List.map (fun (_, s, v) -> s,v) enum)

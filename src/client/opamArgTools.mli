@@ -64,7 +64,6 @@ val mk_opt_vflag_all : cli:OpamCLIVersion.Sourced.t ->
    string option)
   list -> 'a list Term.t
 
-
 val mk_enum_opt:
   cli:OpamCLIVersion.Sourced.t -> validity -> section:string -> string list ->
   string -> (validity * string * 'a) list -> string -> 'a option Term.t

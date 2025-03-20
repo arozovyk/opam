@@ -1842,22 +1842,17 @@ let package_selection  ?(admin=false) cli =
   in
   let filter combined_selector recursive depopts nobuild post dev doc_flag 
       test dev_setup field_match has_flag has_tag =
-
     let dependency_toggles = {
       OpamListCommand.
       recursive; depopts; build = not nobuild; post; test; dev_setup;
       doc = doc_flag; dev
     } in
-    let combined_selector = List.map (fun cs-> cs dependency_toggles) combined_selector in
-    
-    List.iter (fun selector -> 
-      match selector with 
-      OpamListCommand.Installed -> Printf.printf "Applying Installed\n" 
-      |OpamListCommand.Latests_only ->  Printf.printf "Applying Latests_only\n" 
-      |OpamListCommand.Depends_on _ ->  Printf.printf "Applying Depends_on\n" 
-      | _ -> ()) combined_selector ;
-
-   ( filter0 [] [] [] [] []
+    let combined_selector = 
+      List.map (fun f-> f dependency_toggles)  combined_selector 
+    in
+    ( filter0 
+      (* depends_on, required_by, conflicts_with, coinstallable_with, resolve*)
+      [] [] [] [] [] 
       recursive depopts nobuild post dev doc_flag test dev_setup field_match
       has_flag has_tag) @ combined_selector 
   in
@@ -1869,9 +1864,9 @@ let package_selection  ?(admin=false) cli =
           has_tag) 
   else  
     Term.(const filter $combined_selector $
-           recursive $ depopts $ nobuild $ post cli $ dev cli $
-        doc_flag cli $ test cli $ dev_setup cli $ field_match $ has_flag $
-        has_tag)
+          recursive $ depopts $ nobuild $ post cli $ dev cli $
+          doc_flag cli $ test cli $ dev_setup cli $ field_match $ has_flag $
+          has_tag)
 
 let package_listing_section = "OUTPUT FORMAT OPTIONS"
 
