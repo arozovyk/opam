@@ -580,37 +580,7 @@ let list ?(force_search=false) cli =
       "Package patterns with globs. Unless $(b,--search) is specified, they \
        match againsta $(b,NAME) or $(b,NAME.VERSION)"
       Arg.string
-  in(* 
-  let (state_selector : OpamListCommand.selector disjunction Term.t ) =
-    mk_vflag_all ~cli ~section:OpamArg.order_sensible_selector_section [
-        cli_original, OpamListCommand.Any, ["A";"all"],
-          "Include all, even uninstalled or unavailable packages";
-        cli_original, OpamListCommand.Installed, ["i";"installed"],
-          "List installed packages only. This is the default when no \
-                further arguments are supplied";
-        cli_original, OpamListCommand.Root, ["roots";"installed-roots"],
-          "List only packages that were explicitly installed, excluding \
-                the ones installed as dependencies";
-        cli_original, OpamListCommand.Available, ["a";"available"],
-          "List only packages that are available on the current system";
-        cli_original, OpamListCommand.Installable, ["installable"],
-          "List only packages that can be installed on the current switch \
-                (this calls the solver and may be more costly; a package \
-                depending on an unavailable package may be available, but is \
-                never installable)";
-        cli_between cli2_0 cli2_1 ~replaced:"--invariant",
-        OpamListCommand.Compiler, ["base"],
-          "List only the immutable base of the current switch (i.e. \
-                compiler packages)";
-        cli_from cli2_3, OpamListCommand.Latests_only, ["latests-only"],
-          "List only the latest version of each package.";
-        cli_from cli2_2, OpamListCommand.Compiler, ["invariant"],
-          "List only the immutable base of the current switch (i.e. \
-                invariant packages)";
-        cli_original, OpamListCommand.Pinned, ["pinned"],
-          "List only the pinned packages";
-      ]
-  in *)
+  in
   let section = selection_docs in
   let search =
     if force_search then Term.const true else
@@ -679,7 +649,7 @@ let list ?(force_search=false) cli =
     in
     let format =
       let force_all_versions =
-        not search (* && state_selector = [] *) && match packages with
+        not search && match packages with
         | [single] ->
           let nameglob =
             match OpamStd.String.cut_at single '.' with
@@ -695,15 +665,6 @@ let list ?(force_search=false) cli =
     let join =
       if disjunction then OpamFormula.ors else OpamFormula.ands
     in
-   (*  let state_selector =
-      if state_selector = [] then
-        if no_switch || search || owns_file <> None then Empty
-        else if packages = [] && selection = ([])
-        then Atom OpamListCommand.Installed
-        else Or (Atom OpamListCommand.Installed,
-                 Atom OpamListCommand.Available)
-      else join (List.map (fun x -> Atom x) state_selector)
-    in *)
     let pattern_selector =
       if search then
         join
@@ -723,7 +684,6 @@ let list ?(force_search=false) cli =
              ((owns_file >>| fun f -> Atom (OpamListCommand.Owns_file f)) +!
               Empty) ::
            List.map (fun x -> Atom x) selection);
-           (* state_selector; *)
       ]
     in
     OpamGlobalState.with_ `Lock_none @@ fun gt ->
@@ -797,10 +757,10 @@ let list ?(force_search=false) cli =
     else if OpamSysPkg.Set.is_empty results_depexts then
       OpamStd.Sys.exit_because `False
   in
-  let term = Term.(const list $global_options cli $package_selection cli 
-  $no_switch $depexts $vars $repos $owns_file $disjunction $search
-  $silent $no_depexts $package_listing cli $pattern_list) in 
-  mk_command  ~cli cli_original "list" ~doc ~man term
+  mk_command  ~cli cli_original "list" ~doc ~man
+    Term.(const list $global_options cli $package_selection cli
+          $no_switch $depexts $vars $repos $owns_file $disjunction $search
+          $silent $no_depexts $package_listing cli $pattern_list)
 
 (* TREE *)
 let tree_doc = "Draw the dependency forest of installed packages."
