@@ -798,9 +798,26 @@ let info st ~fields ~raw ~where ?normalise ?(show_empty=false)
     List.partition (fun (n,_) -> OpamPackage.has_name packages n) atoms
   in
   if missing_atoms <> [] then
-    (OpamConsole.error "No package matching %s found"
+    let choices name = 
+      let dict = fun yield -> List.iter yield 
+          (OpamPackage.Set.to_list st.packages |> 
+           List.map (fun p -> OpamPackage.name p |> 
+                              OpamPackage.Name.to_string)) in 
+      OpamCompat.String.spellcheck dict name 
+    in
+    let choices = 
+      List.fold_left (fun acc ma -> choices
+                         (OpamFormula.short_string_of_atom ma) ::acc)
+        [] missing_atoms |> List.concat |> List.sort_uniq (String.compare) in 
+    let hint = 
+      match choices with 
+        []-> ""
+      | choices ->
+        Printf.sprintf "\nDid you mean %s?" ( String.concat " or " choices)
+    in 
+    (OpamConsole.error "No package matching %s found.%s"
        (OpamStd.List.concat_map " or " OpamFormula.short_string_of_atom
-          missing_atoms);
+          missing_atoms) hint;
      if OpamPackage.Set.is_empty packages then
        OpamStd.Sys.exit_because `Not_found);
   let fields = List.map (field_of_string ~raw) fields in
