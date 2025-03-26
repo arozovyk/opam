@@ -172,3 +172,16 @@ module PIN: sig
   val post_pin_action: rw switch_state -> package_set -> name list -> rw switch_state
 
 end
+
+(** [did_you_mean st atoms] Suggests possible corrections for package names that 
+    are not found in the current state.
+
+    Given a list of package atoms [atoms], this function checks which ones are
+    present in the set of installed and available packages. If any are missing,
+    it attempts to suggest similar package names using a spellchecker.
+
+    @param st The current switch state, containing installed and available packages.
+    @param atoms The list of package atoms to check for possible corrections.
+
+    @return A formatted string suggesting alternative package names *)
+val did_you_mean : 'a switch_state -> atom disjunction -> string
