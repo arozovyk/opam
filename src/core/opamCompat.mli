@@ -11,9 +11,6 @@
 module String : sig
   (* NOTE: OCaml >= 4.13 *)
   val exists: (char -> bool) -> string -> bool
-  
-  (* NOTE: OCaml >= 5.4.0 *)
-  val edit_distance : ?limit:int -> string -> string -> int
 
   (* NOTE: OCaml >= 5.4.0 *)
   val spellcheck :
