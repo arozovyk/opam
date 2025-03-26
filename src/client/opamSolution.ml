@@ -168,7 +168,6 @@ let did_you_mean st atoms =
     in
     Printf.sprintf "\nDid you mean one of these?\n%s\n" formatted_choices
 
-
 let check_availability ?permissive t set atoms =
   let available = OpamPackage.to_map set in
   let check_depexts atom =

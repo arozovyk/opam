@@ -3757,8 +3757,9 @@ let source cli =
             (OpamPackage.Set.filter (OpamFormula.check atom) t.packages)
         with Not_found ->
           OpamConsole.error_and_exit `Not_found
-            "No package matching %s found."
-            (OpamFormula.short_string_of_atom atom)
+            "No package matching %s found.%s"
+            (OpamFormula.short_string_of_atom atom) 
+            (OpamSolution.did_you_mean t [atom])
       in
       let dir = match dir with
         | Some d -> d
