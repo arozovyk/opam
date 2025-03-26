@@ -138,6 +138,37 @@ let atom_of_name name =
   name, None
 *)
 
+let did_you_mean st atoms = 
+  let open OpamPackage.Set.Op in 
+  let packages =
+    OpamFormula.packages_of_atoms ~disj:false
+      (st.packages ++ st.installed) atoms
+  in
+  let choices name = 
+    let dict = fun yield -> List.iter yield 
+        (OpamPackage.Set.to_list (st.packages ++ st.installed) |> 
+         List.map (fun p -> OpamPackage.name p |> 
+                            OpamPackage.Name.to_string)) in 
+    OpamCompat.String.spellcheck dict name 
+  in
+  let _, missing_atoms =
+    List.partition (fun (n,_) -> OpamPackage.has_name packages n) atoms
+  in
+  let choices = 
+    List.fold_left (fun acc ma -> 
+        choices (OpamFormula.short_string_of_atom ma) ::acc)
+      [] missing_atoms |> List.concat |> List.sort_uniq String.compare 
+  in 
+  match choices with 
+  | [] -> ""
+  | [single] -> Printf.sprintf "\nDid you mean %s ?" single
+  | _ ->
+    let formatted_choices =
+      choices |> List.map (fun c -> Printf.sprintf "- %s" c) |> String.concat "\n"
+    in
+    Printf.sprintf "\nDid you mean one of these?\n%s\n" formatted_choices
+
+
 let check_availability ?permissive t set atoms =
   let available = OpamPackage.to_map set in
   let check_depexts atom =
@@ -177,15 +208,17 @@ let check_availability ?permissive t set atoms =
     in
     if exists then None
     else match check_depexts atom with Some _ as some -> some | None ->
-    if permissive = Some true
-    then Some (OpamSwitchState.not_found_message t atom)
-    else
-    let f = name, match cstr with None -> Empty | Some c -> Atom c in
-    Some (Printf.sprintf "%s: %s"
-            (OpamFormula.to_string (Atom f))
-            (OpamSwitchState.unavailable_reason
-               ~default:"the package no longer exists"
-               t f)) in
+      if permissive = Some true
+      then Some (Printf.sprintf "%s%s" (OpamSwitchState.not_found_message t atom)
+                   (did_you_mean t [name, cstr]))
+      else
+        let f = name, match cstr with None -> Empty | Some c -> Atom c in
+        Some (Printf.sprintf "%s: %s"
+                (OpamFormula.to_string (Atom f))
+                (OpamSwitchState.unavailable_reason
+                   ~hint:(did_you_mean t [name, cstr])
+                   ~default:"the package no longer exists"
+                   t f)) in
   let errors = OpamStd.List.filter_map check_atom atoms in
   if errors <> [] then
     (List.iter (OpamConsole.error "%s") errors;

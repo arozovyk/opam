@@ -2720,32 +2720,3 @@ module PIN = struct
 
   let list = list
 end
-
-let did_you_mean st atoms = 
-  let packages =
-    OpamFormula.packages_of_atoms ~disj:false
-      (st.packages ++ st.installed) atoms
-  in
-  let choices name = 
-    let dict = fun yield -> List.iter yield 
-        (OpamPackage.Set.to_list (st.packages ++ st.installed) |> 
-         List.map (fun p -> OpamPackage.name p |> 
-                            OpamPackage.Name.to_string)) in 
-    OpamCompat.String.spellcheck dict name 
-  in
-  let _, missing_atoms =
-    List.partition (fun (n,_) -> OpamPackage.has_name packages n) atoms
-  in
-  let choices = 
-    List.fold_left (fun acc ma -> 
-        choices (OpamFormula.short_string_of_atom ma) ::acc)
-      [] missing_atoms |> List.concat |> List.sort_uniq String.compare 
-  in 
-  match choices with 
-  | [] -> ""
-  | [single] -> Printf.sprintf "\nDid you mean %s ?" single
-  | _ ->
-    let formatted_choices =
-      choices |> List.map (fun c -> Printf.sprintf "- %s" c) |> String.concat "\n"
-    in
-    Printf.sprintf "\nDid you mean one of these?\n%s\n" formatted_choices
