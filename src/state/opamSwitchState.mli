@@ -286,7 +286,7 @@ val unavailable_reason_raw:
     [default] is returned if no reason why it wouldn't be available was found
     (empty string if unspecified). *)
 val unavailable_reason:
-  'a switch_state -> ?default:string -> name * OpamFormula.version_formula ->
+  'a switch_state -> ?default:string -> ?hint:string -> name * OpamFormula.version_formula ->
   string
 
 (** Returns [true] when the package has the [avoid-version] flag and there isn't

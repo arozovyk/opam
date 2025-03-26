@@ -1111,6 +1111,8 @@ let dump_pef_state st oc =
 let is_switch_globally_set st =
   OpamFile.Config.switch st.switch_global.config = Some st.switch
 
+
+
 let not_found_message st (name, cstr) =
   match cstr with
   | Some (relop,v) when OpamPackage.has_name st.packages name ->
@@ -1119,8 +1121,8 @@ let not_found_message st (name, cstr) =
       (match relop with `Eq -> "" | r -> OpamPrinter.FullPos.relop_kind r)
       (OpamPackage.Version.to_string v)
   | _ ->
-    Printf.sprintf "No package named %s found."
-      (OpamPackage.Name.to_string name)
+     Printf.sprintf "No package named %s found."
+      (OpamPackage.Name.to_string name)  
 
 (* Display a meaningful error for an unavailable package *)
 let unavailable_reason_raw st (name, vformula) =
@@ -1177,12 +1179,12 @@ let unavailable_reason_raw st (name, vformula) =
     | None -> `Default
 
 (* Display a meaningful error for an unavailable package *)
-let unavailable_reason st ?(default="") atom =
+let unavailable_reason st ?(default="") ?(hint="") atom =
   match unavailable_reason_raw st atom with
   | `UnknownVersion ->
     "no matching version"
   | `UnknownPackage ->
-    "unknown package"
+    Printf.sprintf "unknown package%s" hint
   | `NoDefinition ->
     "no package definition found"
   | `Pinned nv ->
