@@ -1203,8 +1203,8 @@ let did_you_mean st atoms =
     List.fold_left (fun acc ma -> 
         match choices (OpamFormula.short_string_of_atom ma) with 
         (* Pick the first choice *)
-          hd:: _ ->  hd :: acc
-        | []-> acc)
+        | hd::_ -> hd :: acc
+        | [] -> acc)
       [] missing_atoms |> List.rev
   in 
   List.iter (fun choice ->
