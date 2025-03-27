@@ -140,26 +140,31 @@ let atom_of_name name =
 
 let did_you_mean st atoms = 
   let open OpamPackage.Set.Op in 
-  let packages =
+  let all_packages = st.packages ++ st.installed in
+  let all_package_names = 
+    OpamPackage.Set.fold
+      (fun p acc -> OpamPackage.Name.Set.add (OpamPackage.name p) acc) 
+      all_packages OpamPackage.Name.Set.empty 
+  in
+  let packages_of_atoms =
     OpamFormula.packages_of_atoms ~disj:false
-      (st.packages ++ st.installed) atoms
+      all_packages atoms
   in
   let choices name = 
-    let dict yield =
-      List.iter yield 
-        (OpamPackage.Set.to_list (st.packages ++ st.installed) |> 
-         List.map (fun p -> OpamPackage.name p |> 
-                            OpamPackage.Name.to_string)) 
+    let dict yield = 
+      OpamPackage.Name.Set.iter 
+        (fun p -> 
+           yield (OpamPackage.Name.to_string p)) all_package_names
     in 
     OpamCompat.String.spellcheck dict name 
   in
-  let _, missing_atoms =
-    List.partition (fun (n,_) -> OpamPackage.has_name packages n) atoms
+  let missing_atoms =
+    List.filter (fun (n,_) -> not @@ OpamPackage.has_name packages_of_atoms n) atoms
   in
   let choices = 
     List.fold_left (fun acc ma -> 
         choices (OpamFormula.short_string_of_atom ma) :: acc)
-      [] missing_atoms |> List.concat |> List.sort_uniq String.compare 
+      [] missing_atoms |> List.concat |> List.rev
   in 
   match choices with 
   | [] -> ""
@@ -168,7 +173,7 @@ let did_you_mean st atoms =
     let formatted_choices =
       choices |> List.map (fun c -> Printf.sprintf "- %s" c) |> String.concat "\n"
     in
-    Printf.sprintf "\nDid you mean one of these?\n%s\n" formatted_choices
+    Printf.sprintf "\nDid you mean one of these?\n%s\n" formatted_choices  
 
 let check_availability ?permissive t set atoms =
   let available = OpamPackage.to_map set in
@@ -209,9 +214,9 @@ let check_availability ?permissive t set atoms =
     in
     if exists then None
     else match check_depexts atom with Some _ as some -> some | None ->
-      if permissive = Some true
-      then Some (Printf.sprintf "%s%s" (OpamSwitchState.not_found_message t atom)
-                   (did_you_mean t [name, cstr]))
+      if permissive = Some true then
+        Some (Printf.sprintf "%s%s" (OpamSwitchState.not_found_message t atom)
+                (did_you_mean t [name, cstr]))
       else
         let f = name, match cstr with None -> Empty | Some c -> Atom c in
         Some (Printf.sprintf "%s: %s"
