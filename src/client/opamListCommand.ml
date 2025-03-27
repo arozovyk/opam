@@ -794,7 +794,7 @@ let info st ~fields ~raw ~where ?normalise ?(show_empty=false)
     OpamFormula.packages_of_atoms ~disj:all_versions
       (st.packages ++ st.installed) atoms
   in
-  let show_hint st = OpamSolution.did_you_mean st atoms in
+  let show_hint st = OpamSwitchState.did_you_mean st atoms in
   let atoms, missing_atoms =
     List.partition (fun (n,_) -> OpamPackage.has_name packages n) atoms
   in

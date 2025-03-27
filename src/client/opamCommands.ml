@@ -3759,7 +3759,7 @@ let source cli =
           OpamConsole.error
             "No package matching %s found."
             (OpamFormula.short_string_of_atom atom);
-          (OpamSolution.did_you_mean t [atom]);
+          (OpamSwitchState.did_you_mean t [atom]);
           OpamStd.Sys.exit_because `Not_found
       in
       let dir = match dir with
