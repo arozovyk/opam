@@ -138,7 +138,6 @@ let atom_of_name name =
   name, None
 *)
 
-
 let check_availability ?permissive t set atoms =
   let available = OpamPackage.to_map set in
   let check_depexts atom =
@@ -180,7 +179,7 @@ let check_availability ?permissive t set atoms =
     else match check_depexts atom with Some s -> Some (s, Fun.id) | None ->
       let show_hint () = OpamSwitchState.did_you_mean t [name, cstr] in
       if permissive = Some true then
-        Some ((Printf.sprintf "%s" (OpamSwitchState.not_found_message t atom)), show_hint)
+        Some ((OpamSwitchState.not_found_message t atom), show_hint)
       else
         let f = name, match cstr with None -> Empty | Some c -> Atom c in
         Some (Printf.sprintf "%s: %s"

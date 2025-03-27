@@ -292,8 +292,8 @@ val did_you_mean : 'a switch_state -> atom disjunction -> unit
     [default] is returned if no reason why it wouldn't be available was found
     (empty string if unspecified). *)
 val unavailable_reason:
-  'a switch_state -> ?default:string -> ?hint:string ->
-  name * OpamFormula.version_formula -> string
+  'a switch_state -> ?default:string -> name * OpamFormula.version_formula ->
+  string
 
 (** Returns [true] when the package has the [avoid-version] flag and there isn't
     already a version with that flag installed (which disables the

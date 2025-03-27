@@ -1218,7 +1218,7 @@ let unavailable_reason st ?(default="") atom =
   | `UnknownVersion ->
     "no matching version"
   | `UnknownPackage ->
-    Printf.sprintf "unknown package"
+    "unknown package"
   | `NoDefinition ->
     "no package definition found"
   | `Pinned nv ->
