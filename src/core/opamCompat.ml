@@ -19,6 +19,7 @@ module Uchar = struct
     | '\xE0' .. '\xEF' -> 3
     | '\xF0' .. '\xF4' -> 4
     | _ -> 0
+
   include Stdlib.Uchar
 end
 
@@ -109,7 +110,6 @@ module String = struct
         let d = loop row_minus2 row_minus1 row 1 len0 limit s0 s1 in
         if d > limit then limit else d
 
-  (** NOTE: OCaml >= 5.4.0 *)
   let edit_distance ?limit s0 s1 =
     let us0 = uchar_array_of_utf_8_string s0 in
     edit_distance' ?limit s0 us0 s1
@@ -118,7 +118,6 @@ module String = struct
     | 3 | 4 -> 1
     | _ -> 2
 
-  (** NOTE: OCaml >= 5.4.0 *)
   let spellcheck ?(max_dist = default_max_dist) iter_dict s =
     let min = ref (max_dist s) in
     let acc = ref [] in

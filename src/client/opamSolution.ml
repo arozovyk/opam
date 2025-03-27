@@ -145,10 +145,12 @@ let did_you_mean st atoms =
       (st.packages ++ st.installed) atoms
   in
   let choices name = 
-    let dict = fun yield -> List.iter yield 
+    let dict yield =
+      List.iter yield 
         (OpamPackage.Set.to_list (st.packages ++ st.installed) |> 
          List.map (fun p -> OpamPackage.name p |> 
-                            OpamPackage.Name.to_string)) in 
+                            OpamPackage.Name.to_string)) 
+    in 
     OpamCompat.String.spellcheck dict name 
   in
   let _, missing_atoms =
@@ -156,7 +158,7 @@ let did_you_mean st atoms =
   in
   let choices = 
     List.fold_left (fun acc ma -> 
-        choices (OpamFormula.short_string_of_atom ma) ::acc)
+        choices (OpamFormula.short_string_of_atom ma) :: acc)
       [] missing_atoms |> List.concat |> List.sort_uniq String.compare 
   in 
   match choices with 
@@ -217,7 +219,8 @@ let check_availability ?permissive t set atoms =
                 (OpamSwitchState.unavailable_reason
                    ~hint:(did_you_mean t [name, cstr])
                    ~default:"the package no longer exists"
-                   t f)) in
+                   t f)) 
+  in
   let errors = OpamStd.List.filter_map check_atom atoms in
   if errors <> [] then
     (List.iter (OpamConsole.error "%s") errors;
