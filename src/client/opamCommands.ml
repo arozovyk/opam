@@ -3756,10 +3756,11 @@ let source cli =
           OpamPackage.Set.max_elt
             (OpamPackage.Set.filter (OpamFormula.check atom) t.packages)
         with Not_found ->
-          OpamConsole.error_and_exit `Not_found
-            "No package matching %s found.%s"
-            (OpamFormula.short_string_of_atom atom) 
-            (OpamSolution.did_you_mean t [atom])
+          OpamConsole.error
+            "No package matching %s found."
+            (OpamFormula.short_string_of_atom atom);
+          (OpamSolution.did_you_mean t [atom]);
+          OpamStd.Sys.exit_because `Not_found
       in
       let dir = match dir with
         | Some d -> d

@@ -163,17 +163,16 @@ let did_you_mean st atoms =
   in
   let choices = 
     List.fold_left (fun acc ma -> 
-        choices (OpamFormula.short_string_of_atom ma) :: acc)
-      [] missing_atoms |> List.concat |> List.rev
+        match choices (OpamFormula.short_string_of_atom ma) with 
+        (* Pick the first choice *)
+          hd:: _ ->  hd :: acc
+        | []-> acc)
+      [] missing_atoms |> List.rev
   in 
-  match choices with 
-  | [] -> ""
-  | [single] -> Printf.sprintf "\nDid you mean %s ?" single
-  | _ ->
-    let formatted_choices =
-      choices |> List.map (fun c -> Printf.sprintf "- %s" c) |> String.concat "\n"
-    in
-    Printf.sprintf "\nDid you mean one of these?\n%s\n" formatted_choices  
+  List.iter (fun choice ->
+      OpamConsole.msg "\n%s: Did you mean %s?\n"
+        (OpamConsole.colorise `blue "Hint") (OpamConsole.colorise `bold choice))
+    choices
 
 let check_availability ?permissive t set atoms =
   let available = OpamPackage.to_map set in
@@ -213,22 +212,20 @@ let check_availability ?permissive t set atoms =
       with Not_found -> false
     in
     if exists then None
-    else match check_depexts atom with Some _ as some -> some | None ->
+    else match check_depexts atom with Some s -> Some (s, Fun.id) | None ->
+      let show_hint () = did_you_mean t [name, cstr] in
       if permissive = Some true then
-        Some (Printf.sprintf "%s%s" (OpamSwitchState.not_found_message t atom)
-                (did_you_mean t [name, cstr]))
+        Some ((Printf.sprintf "%s" (OpamSwitchState.not_found_message t atom)), show_hint)
       else
         let f = name, match cstr with None -> Empty | Some c -> Atom c in
         Some (Printf.sprintf "%s: %s"
                 (OpamFormula.to_string (Atom f))
                 (OpamSwitchState.unavailable_reason
-                   ~hint:(did_you_mean t [name, cstr])
-                   ~default:"the package no longer exists"
-                   t f)) 
+                   ~default:"the package no longer exists" t f), show_hint) 
   in
   let errors = OpamStd.List.filter_map check_atom atoms in
   if errors <> [] then
-    (List.iter (OpamConsole.error "%s") errors;
+    (List.iter (fun (e, hint) -> OpamConsole.error "%s" e; hint ()) errors;
      OpamStd.Sys.exit_because `Not_found)
 
 let fuzzy_name t name =

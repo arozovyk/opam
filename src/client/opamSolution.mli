@@ -143,4 +143,4 @@ val sum: stats -> int
     @param atoms The list of package atoms to check for possible corrections.
 
     @return A formatted string suggesting alternative package names *)
-val did_you_mean : 'a switch_state -> atom disjunction -> string
+val did_you_mean : 'a switch_state -> atom disjunction -> unit
