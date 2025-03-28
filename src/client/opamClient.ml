@@ -2413,7 +2413,8 @@ let remove_t ?ask ~autoremove ~force ?(formula=OpamFormula.Empty) atoms t =
           nothing_to_do := false
         with Not_found ->
           OpamConsole.error "No package %s found for (forced) removal.\n"
-            (OpamFormula.short_string_of_atom atom)
+            (OpamFormula.short_string_of_atom atom);
+          OpamSwitchState.did_you_mean t [atom];
       in
       List.iter force_remove not_installed
     else
