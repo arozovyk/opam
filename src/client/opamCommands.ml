@@ -3679,9 +3679,7 @@ let pin ?(unpin_only=false) cli =
            (OpamConsole.error  
               "%s is not installed, invalid flag `--current'"
               (OpamPackage.Name.to_string name);
-            OpamSwitchState.did_you_mean ~installed_only:true st 
-              [OpamSolution.atom_of_package 
-                 (OpamPackage.create name OpamPackage.Version.default)];
+            OpamSwitchState.did_you_mean ~installed_only:true st [name, None];
             OpamStd.Sys.exit_because `Bad_arguments)
          | Some nv, _ ->
            OpamSwitchState.drop @@
