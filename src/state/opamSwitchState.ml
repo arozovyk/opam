@@ -1176,9 +1176,12 @@ let unavailable_reason_raw st (name, vformula) =
       `MissingDepexts missing
     | None -> `Default
 
-let did_you_mean st atoms = 
+let did_you_mean ?(installed_only=false) st atoms = 
   let open OpamPackage.Set.Op in 
-  let all_packages = st.packages ++ st.installed in
+  let all_packages =
+    if installed_only then st.installed
+    else st.packages ++ st.installed
+  in
   let all_package_names = 
     OpamPackage.Set.fold
       (fun p acc -> OpamPackage.Name.Set.add (OpamPackage.name p) acc) 
