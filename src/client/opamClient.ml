@@ -2584,9 +2584,12 @@ module PIN = struct
           (OpamPackage.Name.to_string name)
       | Some url -> url
     with Not_found ->
-      OpamConsole.error_and_exit `Not_found
+      OpamConsole.error
         "No package named %S found"
-        (OpamPackage.Name.to_string name)
+        (OpamPackage.Name.to_string name);
+      (OpamSwitchState.did_you_mean t 
+         [OpamSolution.atom_of_package (OpamPackage.create name OpamPackage.Version.default)]);
+      OpamStd.Sys.exit_because `Not_found
 
   let pin st name ?(edit=false) ?version ?(action=true) ?subpath ?locked target =
     try
