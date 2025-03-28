@@ -3676,7 +3676,7 @@ let pin ?(unpin_only=false) cli =
              (OpamPackage.Version.to_string v)
              (OpamPackage.Version.to_string nv.version)
          | None, _ ->
-           (OpamConsole.error  
+           (OpamConsole.error
               "%s is not installed, invalid flag `--current'"
               (OpamPackage.Name.to_string name);
             OpamSwitchState.did_you_mean ~installed_only:true st [name, None];

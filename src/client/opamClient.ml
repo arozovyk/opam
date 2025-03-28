@@ -2693,8 +2693,10 @@ module PIN = struct
         else
           OpamStd.Sys.exit_because `Aborted
       | None ->
-        OpamConsole.error_and_exit `Not_found
-          "Package is not pinned, and no existing version was supplied."
+        OpamConsole.error  
+          "Package is not pinned, and no existing version was supplied.";
+        OpamSwitchState.did_you_mean st [name, None];
+        OpamStd.Sys.exit_because `Not_found
     in
     if action then post_pin_action st pinned [name]
     else st
