@@ -437,7 +437,7 @@ let run st tog ?no_constraint mode filter atoms =
            (match missing with | [_] -> "" | _ -> "s")
            (OpamStd.Format.pretty_list
               (List.map OpamFormula.string_of_atom missing));
-         OpamSwitchState.did_you_mean st missing);
+         OpamSwitchState.did_you_mean ~installed_only:true st missing);
       if OpamPackage.Set.is_empty select && atoms <> [] then
         OpamConsole.error_and_exit `Not_found "No package to display"
       else
