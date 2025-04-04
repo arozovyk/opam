@@ -722,7 +722,8 @@ let set_invariant ?(force=false) st invariant =
       else 
         fun fmt e ->
           (OpamConsole.error fmt e;
-           OpamSwitchState.did_you_mean st (List.map (fun n -> n, None) names_unknown);
+           OpamSwitchState.did_you_mean ~installed_only:true st 
+             (List.map (fun n -> n, None) names_unknown);
            OpamStd.Sys.exit_because `Not_found))
        "No packages by these names found: %s"
        (OpamStd.List.concat_map ", "

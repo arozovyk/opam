@@ -11,7 +11,6 @@
 module Uchar = struct 
   [@@@warning "-32"]
 
-
   let rep = 0xFFFD
 
   (** NOTE: OCaml >= 5.4.0 *)
@@ -22,15 +21,13 @@ module Uchar = struct
     | '\xE0' .. '\xEF' -> 3
     | '\xF0' .. '\xF4' -> 4
     | _ -> 0
-
-    external to_int : Stdlib.Uchar.t -> int = "%identity"
-    let decode_bits = 24
-
-    let[@inline] utf_decode n u = ((8 lor n) lsl decode_bits) lor (to_int u)
-
-    let[@inline] utf_decode_invalid n = (n lsl decode_bits) lor rep
-
-
+  external unsafe_of_int : int -> Stdlib.Uchar.t = "%identity"
+  external to_int : Stdlib.Uchar.t -> int = "%identity"
+  let decode_bits = 24
+  let[@inline] utf_decode_length d = (d lsr decode_bits) land 0b111
+  let[@inline] utf_decode_uchar d = unsafe_of_int (d land 0xFFFFFF)
+  let[@inline] utf_decode n u = ((8 lor n) lsl decode_bits) lor (to_int u)
+  let[@inline] utf_decode_invalid n = (n lsl decode_bits) lor rep
 
   include Stdlib.Uchar
 end
@@ -59,8 +56,6 @@ module Bytes = struct
     ((b2 land 0x3F) lsl 6) lor
     ((b3 land 0x3F))
   let dec_invalid = Uchar.utf_decode_invalid
-
-
 
   let get_utf_8_uchar b i =
     let b0 = Bytes.get_uint8 b i in (* raises if [i] is not a valid index. *)
