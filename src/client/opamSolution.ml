@@ -176,7 +176,7 @@ let check_availability ?permissive t set atoms =
       with Not_found -> false
     in
     if exists then None
-    else match check_depexts atom with Some s -> Some (s, Fun.id) | None ->
+    else match check_depexts atom with Some s -> Some (s, fun ()->"") | None ->
       let show_hint () = OpamSwitchState.did_you_mean t [name, cstr] in
       if permissive = Some true then
         Some ((OpamSwitchState.not_found_message t atom), show_hint)
@@ -189,7 +189,7 @@ let check_availability ?permissive t set atoms =
   in
   let errors = OpamStd.List.filter_map check_atom atoms in
   if errors <> [] then
-    (List.iter (fun (e, hint) -> OpamConsole.error "%s" e; hint ()) errors;
+    (List.iter (fun (e, hint) -> OpamConsole.error "%s%s" e (hint ()); ) errors;
      OpamStd.Sys.exit_because `Not_found)
 
 let fuzzy_name t name =

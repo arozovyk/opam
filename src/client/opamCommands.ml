@@ -3676,11 +3676,10 @@ let pin ?(unpin_only=false) cli =
              (OpamPackage.Version.to_string v)
              (OpamPackage.Version.to_string nv.version)
          | None, _ ->
-           (OpamConsole.error
-              "%s is not installed, invalid flag `--current'"
-              (OpamPackage.Name.to_string name);
-            OpamSwitchState.did_you_mean ~installed_only:true st [name, None];
-            OpamStd.Sys.exit_because `Bad_arguments)
+           (OpamConsole.error_and_exit `Bad_arguments
+              "%s is not installed, invalid flag `--current'%s"
+              (OpamPackage.Name.to_string name)
+              (OpamSwitchState.did_you_mean ~installed_only:true st [name, None]))
          | Some nv, _ ->
            OpamSwitchState.drop @@
            OpamPinCommand.pin_current st nv;
@@ -3758,11 +3757,10 @@ let source cli =
           OpamPackage.Set.max_elt
             (OpamPackage.Set.filter (OpamFormula.check atom) t.packages)
         with Not_found ->
-          OpamConsole.error
-            "No package matching %s found."
-            (OpamFormula.short_string_of_atom atom);
-          (OpamSwitchState.did_you_mean t [atom]);
-          OpamStd.Sys.exit_because `Not_found
+          OpamConsole.error_and_exit `Not_found
+            "No package matching %s found.%s"
+            (OpamFormula.short_string_of_atom atom)
+            ((OpamSwitchState.did_you_mean t [atom]))
       in
       let dir = match dir with
         | Some d -> d

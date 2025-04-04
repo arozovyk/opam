@@ -286,7 +286,7 @@ val unavailable_reason_raw:
     For each missing package, it uses string edit distance (up to a maximum of 2)
     to suggest the closest matching package name from the set of all known
     (or installed if [installed_only] is [true]) packages. *)
-val did_you_mean : ?installed_only:bool -> 'a switch_state -> atom disjunction -> unit
+val did_you_mean : ?installed_only:bool -> 'a switch_state -> atom disjunction -> string
 
 (** Returns a printable explanation why a package is not currently available
     (pinned to an incompatible version, unmet [available:] constraints...).

@@ -1206,10 +1206,10 @@ let did_you_mean ?(installed_only=false) st atoms =
         | [] -> acc)
       [] missing_names |> List.rev
   in
-  List.iter (fun choice ->
-      OpamConsole.msg "\n%s: Did you mean %s?\n"
+  List.map (fun choice ->
+      Printf.sprintf "\n%s: Did you mean %s?\n"
         (OpamConsole.colorise `blue "Hint") (OpamConsole.colorise `bold choice))
-    choices
+    choices |> String.concat ""
 
 (* Display a meaningful error for an unavailable package *)
 let unavailable_reason st ?(default="") atom =

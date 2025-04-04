@@ -799,10 +799,9 @@ let info st ~fields ~raw ~where ?normalise ?(show_empty=false)
     List.partition (fun (n,_) -> OpamPackage.has_name packages n) atoms
   in
   if missing_atoms <> [] then
-    (OpamConsole.error "No package matching %s found"
+    (OpamConsole.error "No package matching %s found%s"
        (OpamStd.List.concat_map " or " OpamFormula.short_string_of_atom
-          missing_atoms);
-     (show_hint st);
+          missing_atoms) (show_hint st);
      if OpamPackage.Set.is_empty packages then
        OpamStd.Sys.exit_because `Not_found);
   let fields = List.map (field_of_string ~raw) fields in
