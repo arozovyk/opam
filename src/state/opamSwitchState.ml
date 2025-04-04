@@ -1177,39 +1177,35 @@ let unavailable_reason_raw st (name, vformula) =
     | None -> `Default
 
 let did_you_mean ?(installed_only=false) st atoms = 
-  let open OpamPackage.Set.Op in 
+  let open OpamPackage.Set.Op in
   let all_packages =
     if installed_only then st.installed
     else st.packages ++ st.installed
   in
-  let all_package_names = 
-    OpamPackage.Set.fold
-      (fun p acc -> OpamPackage.Name.Set.add (OpamPackage.name p) acc) 
-      all_packages OpamPackage.Name.Set.empty 
-  in
-  let packages_of_atoms =
-    OpamFormula.packages_of_atoms ~disj:false
-      all_packages atoms
-  in
+  let all_package_names = OpamPackage.names_of_packages all_packages in
   let choices name = 
     let dict yield = 
       OpamPackage.Name.Set.iter 
-        (fun p -> 
-           yield (OpamPackage.Name.to_string p)) all_package_names
-    in 
+        (fun p -> yield (OpamPackage.Name.to_string p)) all_package_names
+    in
     OpamCompat.String.spellcheck dict name 
   in
-  let missing_atoms =
-    List.filter (fun (n,_) -> not @@ OpamPackage.has_name packages_of_atoms n) atoms
+  let missing_names =
+    List.filter_map (fun (name,_) ->
+        if not (OpamPackage.Name.Set.mem name all_package_names) then
+          Some (OpamPackage.Name.to_string name) 
+        else
+          None 
+      ) atoms
   in
   let choices = 
-    List.fold_left (fun acc ma -> 
-        match choices (OpamFormula.short_string_of_atom ma) with 
+    List.fold_left (fun acc mpn -> 
+        match choices mpn with 
         (* Pick the first choice *)
         | hd::_ -> hd :: acc
         | [] -> acc)
-      [] missing_atoms |> List.rev
-  in 
+      [] missing_names |> List.rev
+  in
   List.iter (fun choice ->
       OpamConsole.msg "\n%s: Did you mean %s?\n"
         (OpamConsole.colorise `blue "Hint") (OpamConsole.colorise `bold choice))
