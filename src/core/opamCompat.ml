@@ -11,6 +11,9 @@
 module Uchar = struct 
   [@@@warning "-32"]
 
+
+  let rep = 0xFFFD
+
   (** NOTE: OCaml >= 5.4.0 *)
   let utf_8_decode_length_of_byte = function
     | '\x00' .. '\x7F' -> 1
@@ -24,6 +27,9 @@ module Uchar = struct
     let decode_bits = 24
 
     let[@inline] utf_decode n u = ((8 lor n) lsl decode_bits) lor (to_int u)
+
+    let[@inline] utf_decode_invalid n = (n lsl decode_bits) lor rep
+
 
 
   include Stdlib.Uchar
