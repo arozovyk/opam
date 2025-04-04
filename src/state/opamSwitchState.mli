@@ -284,7 +284,7 @@ val unavailable_reason_raw:
 (** [did_you_mean switch_state atoms] prints suggestions for package names in [atoms]
     that could not be found in the given [switch_state].
     For each missing package, it uses string edit distance (up to a maximum of 2)
-    to suggest the closest matching package name from the set of available
+    to suggest the closest matching package name from the set of all known
     (or installed if [installed_only] is [true]) packages. *)
 val did_you_mean : ?installed_only:bool -> 'a switch_state -> atom disjunction -> unit
 
