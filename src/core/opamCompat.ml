@@ -8,6 +8,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
+
+module Int = struct 
+
+  let min x y : Stdlib.Int.t = if x <= y then x else y
+  let max x y : Stdlib.Int.t = if x >= y then x else y
+
+  include Stdlib.Int 
+end 
+
 module Uchar = struct 
   [@@@warning "-32"]
 
@@ -164,7 +173,7 @@ module String = struct
             let row_min = ref Int.max_int in
             row.(0) <- i;
             let jmax =
-              let jmax = Int.min len1 (i + limit - 1) in
+              let jmax = min len1 (i + limit - 1) in
               if jmax < 0 then (* overflow *) len1 else jmax
             in
             for j = Int.max 1 (i - limit) to jmax do
