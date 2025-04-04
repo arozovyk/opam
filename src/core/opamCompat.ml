@@ -10,6 +10,7 @@
 
 
 module Int = struct 
+  [@@@warning "-32"]
 
   let min x y : Stdlib.Int.t = if x <= y then x else y
   let max x y : Stdlib.Int.t = if x >= y then x else y
