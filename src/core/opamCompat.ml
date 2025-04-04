@@ -20,6 +20,12 @@ module Uchar = struct
     | '\xF0' .. '\xF4' -> 4
     | _ -> 0
 
+    external to_int : Stdlib.Uchar.t -> int = "%identity"
+    let decode_bits = 24
+
+    let[@inline] utf_decode n u = ((8 lor n) lsl decode_bits) lor (to_int u)
+
+
   include Stdlib.Uchar
 end
 
