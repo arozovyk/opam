@@ -1207,7 +1207,7 @@ let did_you_mean ?(installed_only=false) st atoms =
       [] missing_names |> List.rev
   in
   List.map (fun choice ->
-      Printf.sprintf "\n%s: Did you mean %s?\n"
+      Printf.sprintf "\n%s: Did you mean %s?"
         (OpamConsole.colorise `blue "Hint") (OpamConsole.colorise `bold choice))
     choices |> String.concat ""
 
