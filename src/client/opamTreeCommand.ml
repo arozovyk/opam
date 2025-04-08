@@ -399,9 +399,10 @@ let dry_install tog st universe install =
   | Conflicts cs ->
     OpamConsole.error
       "Could not simulate installing the specified package(s) to this switch:";
-    OpamConsole.errmsg "%s"
+    OpamConsole.errmsg "%s%s"
       (OpamCudf.string_of_conflicts st.packages
-         (OpamSwitchState.unavailable_reason st) cs);
+         (OpamSwitchState.unavailable_reason st) cs)
+      (OpamSwitchState.did_you_mean st install);
     OpamStd.Sys.exit_because `No_solution
 
 let run st tog ?no_constraint mode filter atoms =
