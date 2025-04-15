@@ -235,7 +235,7 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   for exclude in $opam_libs; do
     packages=$(echo "$packages" | grep -v -x "$exclude")
   done
-  packages="" #just to skip
+  packages="" #just to skip 
   for pkg in $packages; do
     dev_repo=$(opam show "$pkg" -f dev-repo 2>/dev/null | head -n 1)
 
