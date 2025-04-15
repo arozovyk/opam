@@ -131,6 +131,7 @@ jobs:
         GITHUB_PR_USER: ${{ github.event.pull_request.user.login }}
       run: bash -exu .github/scripts/main/main.sh x86_64-pc-linux-gnu
     - name: Comment or update PR with dependency errors
+      if: github.event_name == 'pull_request'
       uses: actions/github-script@v7
       env:
         OCAMLV: ${{ matrix.ocamlv }}
