@@ -32,6 +32,7 @@ env:
   CYGWIN_ROOT: D:\cygwin
   CYGWIN: winsymlinks:native
   CYGWIN_EPOCH: 3
+  COMPILERS: "5.3.0 4.14.2"
 
 defaults:
   run:
@@ -746,12 +747,18 @@ jobs:
         GITHUB_PR_USER: ${{ github.event.pull_request.user.login }}
       run: bash -exu .github/scripts/main/main.sh x86_64-pc-linux-gnu
     - name: Comment or update PR with dependency errors
-      if: env.LIB_ERRORS != ''
       uses: actions/github-script@v7
+      env:
+        OCAMLV: ${{ matrix.ocamlv }}
       with:
         script: |
-          const marker = '<!-- opam-lib-error-report -->';
-          const body = `${marker}\nSome plugin dependencies failed to build:\n\n${process.env.LIB_ERRORS}`;
+          const version = process.env.OCAMLV;
+          const envKey = `LIB_ERRORS_${version.replace(/\./g, "_")}`;
+          const error = process.env[envKey];
+          if (!error) return;
+
+          const marker = `<!-- ocaml-${version}-error -->`;
+          const body = `${marker}\n${error}`;
 
           const comments = await github.rest.issues.listComments({
             owner: context.repo.owner,
@@ -759,10 +766,11 @@ jobs:
             issue_number: context.payload.pull_request.number,
           });
 
-          const existing = comments.data.find(comment =>
-            comment.user.login === 'github-actions[bot]' &&
-            comment.body.includes(marker)
+          const existing = comments.data.find(c =>
+            c.user.login === 'github-actions[bot]' &&
+            c.body.startsWith(marker)
           );
+
           if (existing) {
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
