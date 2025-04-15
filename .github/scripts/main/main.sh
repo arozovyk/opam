@@ -235,7 +235,7 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   for exclude in $opam_libs; do
     packages=$(echo "$packages" | grep -v -x "$exclude")
   done
-
+  packages="odig"
   for pkg in $packages; do
     dev_repo=$(opam show "$pkg" -f dev-repo 2>/dev/null | head -n 1)
 
@@ -256,7 +256,7 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
     SAFE_VER=${OCAMLVER//./_}
     echo "LIB_ERRORS_$SAFE_VER<<EOF" >> "$GITHUB_ENV"
     COMMIT_SHA=$(git rev-parse HEAD)
-    echo "OCAML $SAFE_VER : $LIB_ERRORS commit $COMMIT_SHA" >> "$GITHUB_ENV"
+    echo "OCAML $OCAMLVER :\n $LIB_ERRORS\nCommit $COMMIT_SHA" >> "$GITHUB_ENV"
     echo "EOF" >> "$GITHUB_ENV"
   fi
   
