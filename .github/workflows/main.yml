@@ -157,17 +157,16 @@ jobs:
           );
 
           if (existing) {
-            await github.rest.issues.updateComment({
+            await github.rest.issues.deleteComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              comment_id: existing.id,
-              body: body
-            });
-          } else {
-            await github.rest.issues.createComment({
-              issue_number: context.payload.pull_request.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body
+              comment_id: existing.id
             });
           }
+
+          await github.rest.issues.createComment({
+            issue_number: context.payload.pull_request.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: body
+          });
