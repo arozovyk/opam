@@ -152,7 +152,6 @@ jobs:
           });
 
           const existing = comments.data.find(c =>
-            c.user.login === 'github-actions[bot]' &&
             c.body.startsWith(marker)
           );
 
