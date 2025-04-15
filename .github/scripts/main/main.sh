@@ -256,7 +256,7 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
     SAFE_VER=${OCAMLVER//./_}
     echo "LIB_ERRORS_$SAFE_VER<<EOF" >> "$GITHUB_ENV"
     COMMIT_SHA=$(git rev-parse HEAD)
-    echo "Failed to build : $LIB_ERRORS. OCaml version : $OCAMLVER. Commit $COMMIT_SHA. " >> "$GITHUB_ENV"
+    echo "Failed to build : $LIB_ERRORS. OCaml version : $OCAMLVER. Commit $COMMIT_SHA." >> "$GITHUB_ENV"
     echo "EOF" >> "$GITHUB_ENV"
   fi
   
