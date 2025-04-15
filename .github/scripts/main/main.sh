@@ -250,12 +250,12 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
     echo -e "\e[31mErrors detected in dependencies of plugins $DEPENDS_ERRORS\e[0m";
   fi
   COMMIT_SHA=$(git rev-parse HEAD)
-  OCAMLVER=$(ocamlc -version) 
-  SAFE_VER=${OCAMLVER//./_}
-  LIB_ERRORS="TEST PERSISTENT ERROR COMMENT for $SAFE_VER by $COMMIT_SHA"
+  OCAMLVER=$(ocamlc -version)  
+  LIB_ERRORS="TEST PERSISTENT ERROR COMMENT for $OCAMLVER by $COMMIT_SHA"
 
   if [ -n "$LIB_ERRORS" ]; then
     echo -e "\e[31mErrors detected in plugins $LIB_ERRORS\e[0m"
+    SAFE_VER=${OCAMLVER//./_}
     echo "LIB_ERRORS_$SAFE_VER<<EOF" >> "$GITHUB_ENV"
     echo "$LIB_ERRORS" >> "$GITHUB_ENV"
     echo "EOF" >> "$GITHUB_ENV"
