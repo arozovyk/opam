@@ -249,7 +249,7 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   if [ -n "$DEPENDS_ERRORS" ]; then
     echo -e "\e[31mErrors detected in dependencies of plugins $DEPENDS_ERRORS\e[0m";
   fi
-  LIB_ERRORS="TEST PERSISTENT ERROR COMMENT."
+  LIB_ERRORS="TEST PERSISTENT ERROR COMMENT. [This message has been modified in last commit] "
   if [ -n "$LIB_ERRORS" ]; then
     echo -e "\e[31mErrors detected in plugins $LIB_ERRORS\e[0m"
     echo "LIB_ERRORS<<EOF" >> "$GITHUB_ENV"
