@@ -235,7 +235,7 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   for exclude in $opam_libs; do
     packages=$(echo "$packages" | grep -v -x "$exclude")
   done
-
+  packages="" #just to skip
   for pkg in $packages; do
     dev_repo=$(opam show "$pkg" -f dev-repo 2>/dev/null | head -n 1)
 
@@ -249,8 +249,12 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   if [ -n "$DEPENDS_ERRORS" ]; then
     echo -e "\e[31mErrors detected in dependencies of plugins $DEPENDS_ERRORS\e[0m";
   fi
+  LIB_ERRORS="TEST ERROR"
   if [ -n "$LIB_ERRORS" ]; then
-    echo -e "\e[31mErrors detected in plugins $LIB_ERRORS\e[0m";
+    echo -e "\e[31mErrors detected in plugins $LIB_ERRORS\e[0m"
+    echo "LIB_ERRORS<<EOF" >> "$GITHUB_ENV"
+    echo "$LIB_ERRORS" >> "$GITHUB_ENV"
+    echo "EOF" >> "$GITHUB_ENV"
   fi
   
   (set +x ; echo -en "::endgroup::depends\r") 2>/dev/null
