@@ -252,7 +252,9 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   LIB_ERRORS="TEST PERSISTENT ERROR COMMENT. [This message has been modified in last commit] "
   if [ -n "$LIB_ERRORS" ]; then
     echo -e "\e[31mErrors detected in plugins $LIB_ERRORS\e[0m"
-    echo "LIB_ERRORS<<EOF" >> "$GITHUB_ENV"
+    OCAMLVER=$(ocamlc -version)
+    SAFE_VER=${OCAMLVER//./_}
+    echo "LIB_ERRORS_$SAFE_VER<<EOF" >> "$GITHUB_ENV"
     echo "$LIB_ERRORS" >> "$GITHUB_ENV"
     echo "EOF" >> "$GITHUB_ENV"
   fi
