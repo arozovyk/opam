@@ -32,7 +32,6 @@ env:
   CYGWIN_ROOT: D:\cygwin
   CYGWIN: winsymlinks:native
   CYGWIN_EPOCH: 3
-  COMPILERS: "5.3.0 4.14.2"
 
 defaults:
   run:
