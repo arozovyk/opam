@@ -21,6 +21,11 @@ val packages_status:
   ?env:gt_variables -> OpamFile.Config.t -> OpamSysPkg.Set.t ->
   OpamSysPkg.status
 
+(* Returns available system packages *)
+val available_packages:
+  ?env:gt_variables -> OpamFile.Config.t -> OpamSysPkg.Set.t ->
+  OpamSysPkg.available
+
 (* Returns [true] if the distribution is a stateless installation. It permits to
    define where there is a need to handle installed system packages or not. *)
 val stateless_install: ?env:gt_variables -> unit -> bool
