@@ -20,7 +20,7 @@ module Cache = struct
   type t = {
     cached_repofiles: (repository_name * OpamFile.Repo.t) list;
     cached_opams: (repository_name * OpamFile.OPAM.t OpamPackage.Map.t) list;
-    cached_sys_available_pkgs: (repository_name * OpamSysPkg.Set.t) list;
+    cached_sys_available_pkgs: (repository_name * OpamSysPkg.available) list;
   }
 
   module C = OpamCached.Make (struct
@@ -232,18 +232,27 @@ let load lock_kind gt =
   | None ->
     log "No cache found";
     OpamFilename.with_flock_upgrade `Lock_read lock @@ fun _ ->
-    let repofiles, opams =
-      OpamRepositoryName.Map.fold (fun name url (defs, opams) ->
+    let repofiles, opams , repos_sys_available_pkgs =
+      OpamRepositoryName.Map.fold (fun name url (defs, opams, sys_available_pkgs ) ->
           let repo = mk_repo name url in
           let repo_def, repo_opams =
             load_repo repo (get_root_raw gt.root repos_tmp name)
           in
-          let _repo_depexts = get_repo_depexts repo_opams gt in
+          let chrono = OpamConsole.timer () in
+          let repo_depexts = get_repo_depexts repo_opams gt in
+          let sys_available =
+            OpamSysInteract.available_packages gt.config repo_depexts
+          in
+          log "Loaded %d available system packages in %0.3fs"
+          (match sys_available with OpamSysPkg.Available pkgs -> OpamSysPkg.Set.cardinal pkgs | _ -> -1)
+          (chrono ());
           OpamRepositoryName.Map.add name repo_def defs,
-          OpamRepositoryName.Map.add name repo_opams opams)
-        repos_map (OpamRepositoryName.Map.empty, OpamRepositoryName.Map.empty)
+          OpamRepositoryName.Map.add name repo_opams opams,
+          OpamRepositoryName.Map.add name sys_available sys_available_pkgs)
+        repos_map (OpamRepositoryName.Map.empty,
+                   OpamRepositoryName.Map.empty,
+                   OpamRepositoryName.Map.empty)
     in
-    let repos_sys_available_pkgs = Obj.magic () (* TODO *) in 
     let rt = make_rt repofiles opams repos_sys_available_pkgs in
     Cache.save_new rt;
     rt
