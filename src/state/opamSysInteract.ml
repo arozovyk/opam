@@ -1657,27 +1657,13 @@ let available_packages ?(env=OpamVariable.Map.empty) config packages =
   | Freebsd -> OpamSysPkg.Suppose_available
   | Gentoo -> OpamSysPkg.Suppose_available
   | Homebrew -> 
-    (* From #5372 *)
+    (* From #5372 - modified: no limit to the query length and the header is not present *)
     let sys_available =
       let query = Printf.sprintf "/%s/" (names_re ()) in
-      let max_query_length = 500 in
-      (* brew prints an error message if the query length is too long *)
-      if String.length query > max_query_length then OpamSysPkg.Set.empty
-      else
-        run_query_command "brew" ["search"; "--formula"; query ] |> (function
-            | [] -> []
-            | header :: formulae -> begin
-                let expected_header = "==> Formulae" in
-                if String.equal header expected_header then formulae else (
-                  OpamConsole.warning
-                    "Expected output of `brew search ...` to be '%s' but instead got '%s'"
-                    expected_header
-                    header;
-                  []
-                )
-              end)
-        |> List.map OpamSysPkg.of_string
-        |> OpamSysPkg.Set.of_list
+      log "Running homebrew query %s" query ; 
+      run_query_command "brew" ["search"; "--formula"; query ]  
+      |> List.map OpamSysPkg.of_string
+      |> OpamSysPkg.Set.of_list
     in
     OpamSysPkg.Available (get_relevant sys_available)
   | Macports ->
