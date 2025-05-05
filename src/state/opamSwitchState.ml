@@ -178,8 +178,30 @@ module Installed_cache = OpamCached.Make(struct
     let name = "installed"
   end)
 
+let depexts_status ?env global_config syspkg_set repos_sys_available_pkgs = 
+  let open OpamSysPkg.Set.Op in
+  let installed = OpamSysInteract.installed_packages ?env global_config syspkg_set in  
+  try 
+    let sys_available =
+      OpamRepositoryName.Map.fold (fun _ ra acc ->  
+          match ra with 
+            OpamSysPkg.Available sys_pkgs -> sys_pkgs ++ acc
+          | OpamSysPkg.Suppose_available ->
+            (* Some package managers don't permit to request on available packages. In
+               this case, we consider all non installed packages as [available]. *)
+            raise Exit
+        ) repos_sys_available_pkgs OpamSysPkg.Set.empty 
+    in 
+    (* System available but not yet installed *)
+    let s_available = (syspkg_set -- installed) %% sys_available in
+    let s_not_found = syspkg_set -- installed -- s_available in
+    { OpamSysPkg.s_available; s_not_found }
+  with Exit -> 
+    let s_available = syspkg_set -- installed in
+    { OpamSysPkg.status_empty with s_available }
+
 let depexts_status_of_packages_raw
-    ~depexts ?env global_config switch_config packages =
+    (repos_sys_available_pkgs) ~depexts ?env global_config switch_config packages =
   if OpamPackage.Set.is_empty packages then OpamPackage.Map.empty else
   let open OpamSysPkg.Set.Op in
   let syspkg_set, syspkg_map =
@@ -197,7 +219,7 @@ let depexts_status_of_packages_raw
   in
   let syspkg_set = syspkg_set -- bypass in
   let ret =
-    match OpamSysInteract.packages_status ?env global_config syspkg_set with
+    match depexts_status ?env global_config syspkg_set repos_sys_available_pkgs with
     | status ->
       let status =
         if OpamStateConfig.(!r.no_depexts) then
@@ -517,7 +539,7 @@ let load lock_kind gt rt switch =
     || OpamStateConfig.(!r.no_depexts) then
       lazy OpamPackage.Map.empty
     else lazy (
-      depexts_status_of_packages_raw gt.config switch_config
+      depexts_status_of_packages_raw rt.repos_sys_available_pkgs gt.config switch_config
         ~env:gt.global_variables
         (Lazy.force available_packages)
         ~depexts:(fun package ->
@@ -777,7 +799,8 @@ let depexts st nv =
  depexts_raw ~env nv st.opams
 
 let depexts_status_of_packages st set =
-  depexts_status_of_packages_raw st.switch_global.config st.switch_config set
+  depexts_status_of_packages_raw st.switch_repos.repos_sys_available_pkgs 
+    st.switch_global.config st.switch_config set
     ~env:st.switch_global.global_variables ~depexts:(depexts st)
 
 let depexts_unavailable st nv =
