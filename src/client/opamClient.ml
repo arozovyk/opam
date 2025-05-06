@@ -1600,8 +1600,10 @@ let update_with_init_config ?(overwrite=false) config init_config =
   setifnew C.git_location C.with_git_location_opt
     (I.git_location init_config)
 
+(* WINDOWS *)
 let check_for_sys_packages config system_packages =
   if system_packages <> [] then
+    (* RT available -- ST installed *)
     let status =
       OpamSysInteract.packages_status config
         (OpamSysPkg.Set.of_list system_packages)
@@ -1638,6 +1640,7 @@ let reinit ?(init_config=OpamInitDefaults.init_config()) ~interactive
 
   OpamStd.Option.iter initialise_msys2 msys2_check_root;
   OpamStd.Option.iter OpamSysInteract.Cygwin.install mechanism;
+  (* WINDOWS *)
   check_for_sys_packages config system_packages;
 
   let _all_ok =
@@ -1868,6 +1871,8 @@ let init
 
         OpamStd.Option.iter initialise_msys2 msys2_check_root;
         OpamStd.Option.iter OpamSysInteract.Cygwin.install mechanism;
+        
+        (* WINDOWS *)
         check_for_sys_packages config system_packages;
 
         let dontswitch =

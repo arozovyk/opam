@@ -1275,6 +1275,7 @@ let install_sys_packages_t ~propagate_st ~map_sysmap ~confirm env config
       check_again t sys_packages
   and check_again t sys_packages =
     let open OpamSysPkg.Set.Op in
+    (* TODO: use available from rt *)
     let status =
       OpamSysInteract.packages_status ~env config sys_packages.ti_new
     in

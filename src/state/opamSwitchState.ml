@@ -179,6 +179,7 @@ module Installed_cache = OpamCached.Make(struct
   end)
 
 let depexts_status ?env global_config syspkg_set repos_sys_available_pkgs = 
+  log "calling new depexts status";
   let open OpamSysPkg.Set.Op in
   let installed = OpamSysInteract.installed_packages ?env global_config syspkg_set in  
   try 
@@ -244,7 +245,7 @@ let depexts_status_of_packages_raw
         msg;
       OpamPackage.Map.empty
   in
-  log "depexts loaded in %.3fs" (chronos());
+  log "depexts loaded x in %.3fs" (chronos());
   ret
 
 let depexts_unavailable_raw sys_packages nv =

@@ -996,6 +996,8 @@ let packages_status ?(env=OpamVariable.Map.empty) config packages =
     compute_sets sys_installed
 
 let installed_packages ?(env=OpamVariable.Map.empty) config packages =
+  log "Testing installed packages";
+
   let (+++) pkg set = OpamSysPkg.Set.add (OpamSysPkg.of_string pkg) set in
   (* Some package managers don't permit to request on available packages. In
      this case, we consider all non installed packages as [available]. *)
@@ -1158,6 +1160,7 @@ let installed_packages ?(env=OpamVariable.Map.empty) config packages =
        >    https://dl-cdn.alpinelinux.org/alpine/edge/main
        >    @edge https://dl-cdn.alpinelinux.org/alpine/edge/main
     *)
+    log "TESTING ALPINE";
     let sys_installed, _sys_available =
       let pkg_name =
         Re.(compile @@ seq
