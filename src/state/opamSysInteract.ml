@@ -1242,81 +1242,28 @@ let installed_packages ?(env=OpamVariable.Map.empty) config packages =
     in
     get_relevant sys_installed
   | Debian ->
-    let get_avail_w_virtuals () =
-      let provides_sep = Re.(compile @@ str ", ") in
-      let package_provided str =
-        OpamSysPkg.of_string
-          (match OpamStd.String.cut_at str ' ' with
-           | None -> str
-           | Some (p, _vc) -> p)
+    let get_installed_with_provides () =
+      let open OpamSysPkg in
+      let lines =
+        run_command "dpkg-query" ["-W"; "-f=${Package} ${Status} ${Provides}\\n"]
+        |> snd
       in
-      (* Output format:
-         >Package: apt
-         >Version: 2.1.7
-         >Installed-Size: 4136
-         >Maintainer: APT Development Team <deity@lists.debian.org>
-         >Architecture: amd64
-         >Replaces: apt-transport-https (<< 1.5~alpha4~), apt-utils (<< 1.3~exp2~)
-         >Provides: apt-transport-https (= 2.1.7)
-         > [...]
-         >
-         The `Provides' field contains provided virtual package(s) by current
-         `Package:'.
-         * manpages.debian.org/buster/apt/apt-cache.8.en.html
-         * www.debian.org/doc/debian-policy/ch-relationships.html#s-virtual
-      *)
-      run_query_command "apt-cache"
-        ["search"; names_re (); "--names-only"; "--full"]
-      |> List.fold_left (fun ((avail, provides, latest) as acc) l ->
-          if OpamStd.String.starts_with ~prefix:"Package: " l then
-            let p = String.sub l 9 (String.length l - 9) in
-            p +++ avail, provides, Some (OpamSysPkg.of_string p)
-          else if OpamStd.String.starts_with ~prefix:"Provides: " l then
-            let ps =
-              List.map package_provided (Re.split ~pos:10 provides_sep l)
-              |> OpamSysPkg.Set.of_list
-            in
-            avail ++ ps,
-            (match latest with
-             | Some p -> OpamSysPkg.Map.add p ps provides
-             | None -> provides (* Bad apt-cache output ?? *)),
-            None
-          else acc)
-        (OpamSysPkg.Set.empty, OpamSysPkg.Map.empty, None)
-      |> (fun (a,p,_) -> a,p)
+      List.fold_left (fun acc line ->
+          match String.split_on_char ' ' line with
+          | pkg :: "install" :: "ok" :: "installed" :: rest ->
+            let acc = Set.add (of_string pkg) acc in
+            let provides = String.concat " " rest |> String.trim in
+            if provides = "" then acc
+            else
+              String.split_on_char ',' provides
+              |> List.map (fun s -> match OpamStd.String.cut_at s ' ' with
+                  | Some (name, _) -> String.trim name
+                  | None -> String.trim s)
+              |> List.fold_left (fun acc vp -> Set.add (of_string vp) acc) acc
+          | _ -> acc
+        ) Set.empty lines 
     in
-    let get_installed str_pkgs =
-      (* ouput:
-         >ii  uim-gtk3                 1:1.8.8-6.1  amd64    Universal ...
-         >ri  uim-gtk3-immodule:amd64  1:1.8.8-6.1  amd64    Universal ...
-
-         First column is <desired action><package status>
-         * Desired action:
-           u = Unknown           h = Hold             p = Purge
-           i = Install           r = Remove
-         * Package status:
-           n = Not-installed    U = Unpacked          t = Triggers-pending
-           c = Config-files     F = Half-configured   i = Installed
-           H = Half-installed   W = Triggers-awaiting
-
-         We focus on the second element of the column
-      *)
-      let re_pkg =
-        Re.(compile @@ seq
-              [ bol;
-                alpha;
-                char 'i';
-                rep1 @@ space;
-                group @@ rep1 @@ diff (alt [alnum; punct]) (char ':');
-                (* pkg:arch convention *)
-              ])
-      in
-      (* discard stderr as just nagging *)
-      run_command ~discard_err:true "dpkg-query" ("-l" :: str_pkgs)
-      |> snd
-      |> with_regexp_sgl re_pkg
-    in
-    compute_sets_with_virtual get_avail_w_virtuals get_installed
+    get_installed_with_provides ()
   | Dummy test ->
     let sys_installed =
       match test.installed with
@@ -1613,7 +1560,12 @@ let available_packages ?(env=OpamVariable.Map.empty) config packages =
     in
     OpamSysPkg.Available (get_relevant sys_available)
   | Arch -> OpamSysPkg.Available (compute_sets_for_arch ~pacman:"pacman");
-  | Centos | Altlinux | Suse -> OpamSysPkg.Suppose_available
+  | Centos  -> (* dnf list available | awk '{print $1}' | tail -n +2 *)
+    OpamSysPkg.Suppose_available
+| Suse ->  
+(*zypper --quiet --non-interactive --no-refresh se -u -x | awk -F '|' '{print $2}' | sed 's/^[[:space:]]*//' *)
+      OpamSysPkg.Suppose_available
+      | Altlinux -> OpamSysPkg.Suppose_available
   | Cygwin -> OpamSysPkg.Suppose_available
   | Debian ->
     let get_avail_w_virtuals () =
