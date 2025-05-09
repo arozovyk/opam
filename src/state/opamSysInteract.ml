@@ -1252,6 +1252,7 @@ let installed_packages ?(env=OpamVariable.Map.empty) config packages =
           match String.split_on_char ' ' line with
           | pkg :: "install" :: "ok" :: "installed" :: rest ->
             let acc = Set.add (of_string pkg) acc in
+            log "Rest list of provides size for pkg %s -> %d"  pkg (List.length rest);
             let provides = String.concat " " rest |> String.trim in
             if provides = "" then acc
             else
