@@ -1600,10 +1600,19 @@ let update_with_init_config ?(overwrite=false) config init_config =
   setifnew C.git_location C.with_git_location_opt
     (I.git_location init_config)
 
-let check_for_sys_packages config system_packages =
+let check_for_sys_packages config rt system_packages =
+  let sys_available =
+    OpamRepositoryState.get_repo_available_depexts rt 
+  in 
   if system_packages <> [] then
     let status =
-      OpamSysInteract.packages_status config
+      OpamSysInteract.packages_status 
+        ~sys_available:(
+          if OpamSysPkg.Set.is_empty sys_available then 
+            OpamSysPkg.Suppose_available
+          else 
+            OpamSysPkg.Available sys_available)
+        config
         (OpamSysPkg.Set.of_list system_packages)
     in
     if not (OpamSysPkg.Set.is_empty status.s_available) then
@@ -1638,7 +1647,11 @@ let reinit ?(init_config=OpamInitDefaults.init_config()) ~interactive
 
   OpamStd.Option.iter initialise_msys2 msys2_check_root;
   OpamStd.Option.iter OpamSysInteract.Cygwin.install mechanism;
-  check_for_sys_packages config system_packages;
+
+  let gt = OpamGlobalState.load `Lock_write in
+  let rt = OpamRepositoryState.load `Lock_write gt in
+
+  check_for_sys_packages config rt system_packages;
 
   let _all_ok =
     if bypass_checks then false else
@@ -1666,8 +1679,6 @@ let reinit ?(init_config=OpamInitDefaults.init_config()) ~interactive
   OpamFile.Config.write (OpamPath.config root) config;
   OpamEnv.setup root ~interactive
     ?dot_profile ?update_config ?env_hook ?completion ?inplace shell;
-  let gt = OpamGlobalState.load `Lock_write in
-  let rt = OpamRepositoryState.load `Lock_write gt in
   OpamConsole.header_msg "Updating repositories";
   let _failed, rt =
     OpamRepositoryCommand.update_with_auto_upgrade rt
@@ -1868,7 +1879,11 @@ let init
 
         OpamStd.Option.iter initialise_msys2 msys2_check_root;
         OpamStd.Option.iter OpamSysInteract.Cygwin.install mechanism;
-        check_for_sys_packages config system_packages;
+
+        let gt = OpamGlobalState.load `Lock_write in
+        let rt = OpamRepositoryState.load `Lock_write gt in
+
+        check_for_sys_packages config rt system_packages;
 
         let dontswitch =
           if bypass_checks then false else
@@ -1901,10 +1916,7 @@ let init
         let repos_config = OpamRepositoryName.Map.of_list repos in
         OpamFile.Repos_config.write (OpamPath.repos_config root)
           repos_config;
-
         log "updating repository state";
-        let gt = OpamGlobalState.load `Lock_write in
-        let rt = OpamRepositoryState.load `Lock_write gt in
         OpamConsole.header_msg "Fetching repository information";
         let failed, rt =
           OpamRepositoryCommand.update_with_auto_upgrade rt

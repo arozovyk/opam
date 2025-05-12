@@ -20,7 +20,7 @@ module Cache = struct
   type t = {
     cached_repofiles: (repository_name * OpamFile.Repo.t) list;
     cached_opams: (repository_name * OpamFile.OPAM.t OpamPackage.Map.t) list;
-    cached_sys_available_pkgs: (repository_name * OpamSysPkg.Set.t) list;
+    cached_sys_available_pkgs: (repository_name * OpamSysPkg.available) list;
   }
 
   module C = OpamCached.Make (struct
@@ -158,7 +158,15 @@ let get_root rt name =
 let get_repo_root rt repo =
   get_root_raw rt.repos_global.root rt.repos_tmp repo.repo_name
 
-let get_repo_depexts opams gt =
+let get_repo_available_depexts rt =
+  (* TODO: make it clear from outside as of why this returns an empty set (Suppose_available) *)
+  OpamRepositoryName.Map.fold (fun _ ra acc ->  
+      match ra with 
+        OpamSysPkg.Available sys_pkgs -> OpamSysPkg.Set.Op.(sys_pkgs ++ acc)
+      | OpamSysPkg.Suppose_available -> acc
+    ) ( rt.repos_sys_available_pkgs) OpamSysPkg.Set.empty
+
+let get_repo_depexts_t opams gt =
   let env = OpamPackageVar.resolve_global gt in
   OpamPackage.Map.fold (fun _ opam s ->
       let open OpamSysPkg.Set.Op in 
@@ -238,7 +246,14 @@ let load lock_kind gt =
           let repo_def, repo_opams =
             load_repo repo (get_root_raw gt.root repos_tmp name)
           in
-          let _repo_depexts = get_repo_depexts repo_opams gt in
+          let chrono = OpamConsole.timer () in
+          let repo_depexts = get_repo_depexts_t repo_opams gt in
+          let sys_available =
+            OpamSysInteract.available_packages gt.config repo_depexts
+          in
+          log "Loaded %d available system packages in %0.3fs"
+          (match sys_available with OpamSysPkg.Available pkgs -> OpamSysPkg.Set.cardinal pkgs | _ -> -1)
+          (chrono ());
           OpamRepositoryName.Map.add name repo_def defs,
           OpamRepositoryName.Map.add name repo_opams opams)
         repos_map (OpamRepositoryName.Map.empty, OpamRepositoryName.Map.empty)

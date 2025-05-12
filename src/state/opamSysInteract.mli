@@ -16,10 +16,11 @@ open OpamStateTypes
        repositories, but not installed
      * not found set: packages not found on the defined repositories
    [env] is used to determine host specification.
+   [sys_available] is used to avoid a syscall when possible.
    [config] is used to determine Windows depext installation. *)
 val packages_status:
-  ?env:gt_variables -> OpamFile.Config.t -> OpamSysPkg.Set.t ->
-  OpamSysPkg.status
+  ?env:gt_variables -> ?sys_available:OpamSysPkg.available ->
+  OpamFile.Config.t -> OpamSysPkg.Set.t -> OpamSysPkg.status
 
 (* Returns available system packages *)
 val available_packages:
