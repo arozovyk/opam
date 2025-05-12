@@ -1275,9 +1275,22 @@ let install_sys_packages_t ~propagate_st ~map_sysmap ~confirm env config
       check_again t sys_packages
   and check_again t sys_packages =
     let open OpamSysPkg.Set.Op in
-    (* TODO: use available from rt *)
+    let sys_available =
+      match (propagate_st t) with 
+        Some st -> 
+        OpamRepositoryState.get_repo_available_depexts st.switch_repos 
+      | None -> 
+        (* TODO: investigate*)
+        OpamSysPkg.Set.empty
+    in 
     let status =
-      OpamSysInteract.packages_status ~env config sys_packages.ti_new
+      OpamSysInteract.packages_status 
+        ~sys_available:(
+          if OpamSysPkg.Set.is_empty sys_available then 
+            OpamSysPkg.Suppose_available
+          else 
+            OpamSysPkg.Available sys_available)
+        ~env config sys_packages.ti_new
     in
     let still_missing = status.s_available ++ status.s_not_found in
     let installed = sys_packages.ti_new -- still_missing in
