@@ -9,7 +9,7 @@ on:
       - '.github/scripts/depexts/**'
   push:
     branches:
-      - '*'
+      - 'never'
 
 defaults:
   run:
