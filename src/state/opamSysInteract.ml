@@ -649,7 +649,6 @@ let installed_packages ?(env=OpamVariable.Map.empty) config packages =
        >    https://dl-cdn.alpinelinux.org/alpine/edge/main
        >    @edge https://dl-cdn.alpinelinux.org/alpine/edge/main
     *)
-    log "TESTING ALPINE";
     let sys_installed, _sys_available =
       let pkg_name =
         Re.(compile @@ seq
