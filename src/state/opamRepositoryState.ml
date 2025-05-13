@@ -238,14 +238,10 @@ let load lock_kind gt =
           let repo_def, repo_opams =
             load_repo repo (get_root_raw gt.root repos_tmp name)
           in
-          let chrono = OpamConsole.timer () in
           let repo_depexts = get_repo_depexts repo_opams gt in
           let sys_available =
             OpamSysInteract.available_packages gt.config repo_depexts
           in
-          log "Loaded %d available system packages in %0.3fs"
-          (match sys_available with OpamSysPkg.Available pkgs -> OpamSysPkg.Set.cardinal pkgs | _ -> -1)
-          (chrono ());
           OpamRepositoryName.Map.add name repo_def defs,
           OpamRepositoryName.Map.add name repo_opams opams,
           OpamRepositoryName.Map.add name sys_available sys_available_pkgs)
