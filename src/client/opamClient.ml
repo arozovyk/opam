@@ -1647,13 +1647,7 @@ let reinit ?(init_config=OpamInitDefaults.init_config()) ~interactive
 
   OpamStd.Option.iter initialise_msys2 msys2_check_root;
   OpamStd.Option.iter OpamSysInteract.Cygwin.install mechanism;
-
-  let gt = OpamGlobalState.load `Lock_write in
-  let rt = OpamRepositoryState.load `Lock_write gt in
-
-  check_for_sys_packages config rt system_packages;
-
-  let _all_ok =
+ let _all_ok =
     if bypass_checks then false else
       init_checks ~hard_fail_exn:false init_config
   in
@@ -1680,6 +1674,12 @@ let reinit ?(init_config=OpamInitDefaults.init_config()) ~interactive
   OpamEnv.setup root ~interactive
     ?dot_profile ?update_config ?env_hook ?completion ?inplace shell;
   OpamConsole.header_msg "Updating repositories";
+
+  let gt = OpamGlobalState.load `Lock_write in
+  let rt = OpamRepositoryState.load `Lock_write gt in
+
+  check_for_sys_packages config rt system_packages;
+
   let _failed, rt =
     OpamRepositoryCommand.update_with_auto_upgrade rt
       (OpamRepositoryName.Map.keys rt.repos_definitions)
@@ -1880,11 +1880,6 @@ let init
         OpamStd.Option.iter initialise_msys2 msys2_check_root;
         OpamStd.Option.iter OpamSysInteract.Cygwin.install mechanism;
 
-        let gt = OpamGlobalState.load `Lock_write in
-        let rt = OpamRepositoryState.load `Lock_write gt in
-
-        check_for_sys_packages config rt system_packages;
-
         let dontswitch =
           if bypass_checks then false else
           let all_ok = init_checks init_config in
@@ -1916,6 +1911,11 @@ let init
         let repos_config = OpamRepositoryName.Map.of_list repos in
         OpamFile.Repos_config.write (OpamPath.repos_config root)
           repos_config;
+        let gt = OpamGlobalState.load `Lock_write in
+        let rt = OpamRepositoryState.load `Lock_write gt in
+
+        check_for_sys_packages config rt system_packages;
+
         log "updating repository state";
         OpamConsole.header_msg "Fetching repository information";
         let failed, rt =
