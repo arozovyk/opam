@@ -240,7 +240,8 @@ let load lock_kind gt =
           in
           let repo_depexts = get_repo_depexts repo_opams gt in
           let sys_available =
-            OpamSysInteract.available_packages gt.config repo_depexts
+            OpamSysInteract.available_packages ~env:gt.global_variables 
+              gt.config repo_depexts
           in
           OpamRepositoryName.Map.add name repo_def defs,
           OpamRepositoryName.Map.add name repo_opams opams,
