@@ -158,9 +158,6 @@ let get_root rt name =
 let get_repo_root rt repo =
   get_root_raw rt.repos_global.root rt.repos_tmp repo.repo_name
 
-<<<<<<< HEAD
-let get_repo_depexts opams gt =
-=======
 let get_repo_available_depexts rt =
   (* TODO: make it clear from outside as of why this returns an empty set (Suppose_available) *)
   OpamRepositoryName.Map.fold (fun _ ra acc ->  
@@ -170,7 +167,6 @@ let get_repo_available_depexts rt =
     ) ( rt.repos_sys_available_pkgs) OpamSysPkg.Set.empty
 
 let get_repo_depexts_t opams gt =
->>>>>>> depexts_available_update_dev
   let env = OpamPackageVar.resolve_global gt in
   OpamPackage.Map.fold (fun _ opam s ->
       let open OpamSysPkg.Set.Op in 
@@ -250,7 +246,7 @@ let load lock_kind gt =
           let repo_def, repo_opams =
             load_repo repo (get_root_raw gt.root repos_tmp name)
           in
-          let repo_depexts = get_repo_depexts repo_opams gt in
+          let repo_depexts = get_repo_depexts_t repo_opams gt in
           let sys_available =
             OpamSysInteract.available_packages ~env:gt.global_variables 
               gt.config repo_depexts

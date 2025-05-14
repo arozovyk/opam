@@ -2274,6 +2274,8 @@ let repository cli =
     "Lists the currently selected repositories in priority order from rank 1. \
      With $(b,--all), lists all configured repositories and the switches \
      where they are active.";
+    cli_original, "clear-cache", `clear_cache, [],
+    "Clears repository cache.";
     cli_original, "priority", `priority, ["NAME"; "RANK"],
     "Synonym to $(b,add NAME --rank RANK)";
   ] in
@@ -2560,6 +2562,9 @@ let repository cli =
         OpamConsole.error_and_exit `Bad_arguments
           "No configured repositories by these names found: %s"
           (OpamStd.List.concat_map " " OpamRepositoryName.to_string not_found)
+    | Some `clear_cache, [] ->
+      OpamRepositoryState.Cache.remove ();
+      `Ok ()
     | (None | Some `list), [] ->
       OpamRepositoryState.with_ `Lock_none gt @@ fun rt ->
       if List.mem `All scope then
