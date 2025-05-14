@@ -244,7 +244,7 @@ let depexts_status_of_packages_raw
         msg;
       OpamPackage.Map.empty
   in
-  log "depexts loaded in %.3fs" (chronos());
+  log "depexts loaded x in %.3fs" (chronos());
   ret
 
 let depexts_unavailable_raw sys_packages nv =

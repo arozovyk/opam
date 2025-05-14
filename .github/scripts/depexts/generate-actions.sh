@@ -104,6 +104,15 @@ RUN yum install -y $mainlibs
 RUN yum install -y gcc-c++
 EOF
   ;;
+  rocky)
+    cat > "$dir/Dockerfile" << EOF
+FROM rockylinux:9
+RUN dnf install 'dnf-command(config-manager)' -y
+RUN dnf config-manager --set-enabled crb
+RUN dnf install -y $mainlibs $ocaml
+RUN dnf install -y gcc-c++ diffutils
+EOF
+    ;;
   nix)
     mainlibs=${mainlibs/m4/gnum4}
     mainlibs=${mainlibs/make/gnumake}
@@ -249,9 +258,11 @@ if [ "$target" = fedora ]; then
  test_depext conf-emacs.1
 fi
 
-if [ "$target" = oraclelinux ] || [ "$target" = centos ]; then
+if [ "$target" = oraclelinux ] || [ "$target" = centos ] || [ "$target" = rocky ]; then
   test_depext conf-pkg-config.3
 fi
+
+
 
 # oraclelinux: conf-libev.4-12 conf-npm.1
 # centos: conf-perl.2
