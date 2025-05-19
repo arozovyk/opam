@@ -5,6 +5,10 @@ depexts: "depext-1"
 ### OPAMNODEPEXTS=0 OPAMCONFIRMLEVEL=unsafe-yes
 ### opam var --global os-family=dummy-failure
 Added '[os-family "dummy-failure" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam switch create test --empty
 ### :I: Erroneous package manager install is not blocking :
 ### opam install a | sed-cmd false
@@ -43,6 +47,10 @@ Added '[os-family "dummy-success" "Set through 'opam var'"]' to field global-var
 ### <pkg:foo.1>
 opam-version: "2.0"
 depexts: ["depext-1" "depext-ok" "depext-unav" "depext-avail"]
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install foo | sed-cmd echo
 The following actions will be performed:
 === install 1 package
@@ -79,6 +87,10 @@ Done.
 ### :II:1:b: Success, depext-ok installed, all available
 ### opam var --global os-family=dummy-success:depext-ok:
 Added '[os-family "dummy-success:depext-ok:" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install foo | sed-cmd echo
 The following actions will be performed:
 === install 1 package
@@ -115,6 +127,10 @@ Done.
 ### :II:1:c: Success, none installed, depext-avail available
 ### opam var --global os-family=dummy-success::depext-avail
 Added '[os-family "dummy-success::depext-avail" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install foo
 [ERROR] Package foo depends on the unavailable system packages 'depext-1', 'depext-ok' and 'depext-unav'. You can use `--no-depexts' to attempt installation anyway.
 # Return code 5 #
@@ -124,6 +140,10 @@ Added '[os-family "dummy-success::depext-avail" "Set through 'opam var'"]' to fi
 Nothing to do.
 ### opam var --global os-family=dummy-success:*:
 Added '[os-family "dummy-success:*:" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install foo
 The following actions will be performed:
 === install 1 package
@@ -143,6 +163,10 @@ Done.
 ### :II:1:d: Success, none installed, all available
 ### opam var --global os-family=dummy-success:0:
 Added '[os-family "dummy-success:0:" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install foo | sed-cmd echo
 The following actions will be performed:
 === install 1 package
@@ -179,6 +203,10 @@ Done.
 ### :II:1:e: Success, depext-ok installed, depext-avail available
 ### opam var --global os-family=dummy-success:depext-ok:depext-avail
 Added '[os-family "dummy-success:depext-ok:depext-avail" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install foo
 [ERROR] Package foo depends on the unavailable system packages 'depext-1' and 'depext-unav'. You can use `--no-depexts' to attempt installation anyway.
 # Return code 5 #
@@ -192,6 +220,10 @@ Added '[os-family "dummy-failure" "Set through 'opam var'"]' to field global-var
 ### <pkg:foo.1>
 opam-version: "2.0"
 depexts: ["depext-1" "depext-ok" "depext-unav" "depext-avail"]
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install foo | sed-cmd false
 The following actions will be performed:
 === install 1 package
@@ -225,6 +257,10 @@ Nothing to do.
 ### :II:2:b: Failure, depext-ok installed, all available
 ### opam var --global os-family=dummy-failure:depext-ok:
 Added '[os-family "dummy-failure:depext-ok:" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install foo | sed-cmd false
 The following actions will be performed:
 === install 1 package
@@ -258,6 +294,10 @@ Nothing to do.
 ### :II:2:c: Failure, none installed, depext-avail available
 ### opam var --global os-family=dummy-failure::depext-avail
 Added '[os-family "dummy-failure::depext-avail" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install foo
 [ERROR] Package foo depends on the unavailable system packages 'depext-1', 'depext-ok' and 'depext-unav'. You can use `--no-depexts' to attempt installation anyway.
 # Return code 5 #
@@ -267,6 +307,10 @@ Added '[os-family "dummy-failure::depext-avail" "Set through 'opam var'"]' to fi
 Nothing to do.
 ### opam var --global os-family=dummy-failure:*:
 Added '[os-family "dummy-failure:*:" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install foo
 The following actions will be performed:
 === install 1 package
@@ -286,6 +330,10 @@ Done.
 ### :II:2:d: Failure, none installed, all available
 ### opam var --global os-family=dummy-failure:0:
 Added '[os-family "dummy-failure:0:" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install foo | sed-cmd false
 The following actions will be performed:
 === install 1 package
@@ -319,6 +367,10 @@ Nothing to do.
 ### :II:2:e: Failure, depext-ok installed, depext-avail available
 ### opam var --global os-family=dummy-failure:depext-ok:depext-avail
 Added '[os-family "dummy-failure:depext-ok:depext-avail" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install foo
 [ERROR] Package foo depends on the unavailable system packages 'depext-1' and 'depext-unav'. You can use `--no-depexts' to attempt installation anyway.
 # Return code 5 #
@@ -335,6 +387,10 @@ depexts: ["depext-ok" "depext-avail"]
 ### opam var --global os-family=dummy-success:depext-ok:depext-avail
 Added '[os-family "dummy-success:depext-ok:depext-avail" "Set through 'opam var'"]' to field global-variables in global configuration
 ### :III:1:a: normal install
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install bar | sed-cmd echo
 The following actions will be performed:
 === install 1 package
@@ -362,6 +418,10 @@ Done.
 ### :III:1:b: depext-bypass set by user install
 ### opam option 'depext-bypass="depext-avail"'
 Set to '"depext-avail"' the field depext-bypass in switch bypass
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install bar
 [NOTE] Package bar is already installed (current version is 1).
 ### opam remove bar
@@ -375,6 +435,10 @@ Done.
 ### :III:1:b: depext-bypass set by opam install
 ### opam option depext-bypass=
 Reverted field depext-bypass in switch bypass
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install bar --assume-depexts
 The following actions will be performed:
 === install 1 package
@@ -404,12 +468,20 @@ depexts: ["depext-ok" "depext-unav"]
 ### opam var --global os-family=dummy-success:depext-ok:0
 Added '[os-family "dummy-success:depext-ok:0" "Set through 'opam var'"]' to field global-variables in global configuration
 ### :III:2:a: normal install
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install baz
 [ERROR] Package baz depends on the unavailable system package 'depext-unav'. You can use `--no-depexts' to attempt installation anyway.
 # Return code 5 #
 ### :III:2:b: depext-bypass set by user install
 ### opam option 'depext-bypass="depext-unav"'
 Set to '"depext-unav"' the field depext-bypass in switch bypass
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install baz
 The following actions will be performed:
 === install 1 package
@@ -441,6 +513,10 @@ opam-version: "2.0"
 depexts: ["depext-ok"]
 ### opam var --global os-family=dummy-success
 Added '[os-family "dummy-success" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam update
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+[default] no changes from file://${BASEDIR}/REPO
 ### opam install qux | sed-cmd echo
 The following actions will be performed:
 === install 1 package
@@ -510,17 +586,18 @@ opam-version: "2.0"
 flags: compiler
 ### OPAMVAR_os_family=unknown opam init ./REPO --root ./OPAM2 --no-setup --bypass-checks --compiler comp -y
 No configuration file found, using built-in defaults.
-
-<><> Fetching repository information ><><><><><><><><><><><><><><><><><><><><><>
-[default] Initialised
-
-<><> Creating initial switch 'comp' (invariant ["comp"]) ><><><><><><><><><><><>
-
-<><> Installing new switch packages <><><><><><><><><><><><><><><><><><><><><><>
-Switch invariant: ["comp"]
-[NOTE] External dependency handling not supported for OS family 'unknown'.
-       You can disable this check using 'opam option --global depext=false'
-
-<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
--> installed comp.1
-Done.
+Fatal error: External dependency handling not supported for OS family 'unknown'.
+# Return code 99 #
+### : <><> Fetching repository information ><><><><><><><><><><><><><><><><><><><><><>
+### : [default] Initialised
+### : 
+### : <><> Creating initial switch 'comp' (invariant ["comp"]) ><><><><><><><><><><><>
+### : 
+### : <><> Installing new switch packages <><><><><><><><><><><><><><><><><><><><><><>
+### : Switch invariant: ["comp"]
+### : [NOTE] External dependency handling not supported for OS family 'unknown'.
+### :        You can disable this check using 'opam option --global depext=false'
+### : 
+### : <><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+### : -> installed comp.1
+### : Done.
