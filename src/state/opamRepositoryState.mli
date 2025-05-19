@@ -52,6 +52,10 @@ val get_repo: 'a repos_state -> repository_name -> repository
 
 val load_opams_from_dir: repository_name -> dirname -> OpamFile.OPAM.t OpamPackage.Map.t
 
+(** Returns the set of depexts requires in opam files *)
+val get_repo_depexts: OpamFile.OPAM.t OpamPackage.Map.t -> [< unlocked ] global_state ->  
+  OpamSysPkg.Set.t
+
 (** Load all the metadata within the local mirror of the given repository,
     without cache *)
 val load_repo:
