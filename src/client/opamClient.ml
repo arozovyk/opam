@@ -1294,7 +1294,7 @@ let initialise_msys2 root =
       OpamStd.Sys.exit_because `Aborted
 
 let determine_windows_configuration ?cygwin_setup ?git_location
-                                    ~bypass_checks ~interactive config =
+    ~bypass_checks ~interactive config =
   OpamStd.Option.iter
     (log "Cygwin (from CLI): %a" (slog string_of_cygwin_setup)) cygwin_setup;
   (* Check whether symlinks can be created. Developer Mode is not the only way
@@ -1640,14 +1640,14 @@ let reinit ?(init_config=OpamInitDefaults.init_config()) ~interactive
   let config, mechanism, system_packages, msys2_check_root =
     if Sys.win32 then
       determine_windows_configuration ?cygwin_setup ?git_location
-                                      ~bypass_checks ~interactive config
+        ~bypass_checks ~interactive config
     else
       config, None, [], None
   in
 
   OpamStd.Option.iter initialise_msys2 msys2_check_root;
   OpamStd.Option.iter OpamSysInteract.Cygwin.install mechanism;
- let _all_ok =
+  let _all_ok =
     if bypass_checks then false else
       init_checks ~hard_fail_exn:false init_config
   in

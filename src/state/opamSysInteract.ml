@@ -810,7 +810,6 @@ let installed_packages ?(env=OpamVariable.Map.empty) config packages =
       | `none -> OpamSysPkg.Set.empty
       | `set pkgs -> pkgs %% packages
     in
-
     get_relevant  sys_installed
   | Freebsd ->
     let sys_installed =

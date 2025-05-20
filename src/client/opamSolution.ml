@@ -1276,7 +1276,7 @@ let install_sys_packages_t ~propagate_st ~map_sysmap ~confirm env config
   and check_again t sys_packages =
     let open OpamSysPkg.Set.Op in
     let sys_available =
-      match (propagate_st t) with 
+      match propagate_st t with 
         Some st -> 
         OpamRepositoryState.get_repo_available_depexts st.switch_repos 
       | None -> 

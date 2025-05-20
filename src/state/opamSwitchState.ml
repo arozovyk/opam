@@ -201,51 +201,51 @@ let depexts_status ?env global_config syspkg_set repos_sys_available_pkgs =
     { OpamSysPkg.status_empty with s_available }
 
 let depexts_status_of_packages_raw
-    (repos_sys_available_pkgs) ~depexts ?env global_config switch_config packages =
+    repos_sys_available_pkgs ~depexts ?env global_config switch_config packages =
   if OpamPackage.Set.is_empty packages then OpamPackage.Map.empty else
-  let open OpamSysPkg.Set.Op in
-  let syspkg_set, syspkg_map =
-    OpamPackage.Set.fold (fun nv (set, map) ->
-        let s = depexts nv in
-        s ++ set,
-        if OpamSysPkg.Set.is_empty s then map
-        else OpamPackage.Map.add nv s map)
-      packages (OpamSysPkg.Set.empty, OpamPackage.Map.empty)
-  in
-  let chronos = OpamConsole.timer () in
-  let bypass =
-    OpamFile.Config.depext_bypass global_config ++
-    switch_config.OpamFile.Switch_config.depext_bypass
-  in
-  let syspkg_set = syspkg_set -- bypass in
-  let ret =
-    match depexts_status ?env global_config syspkg_set repos_sys_available_pkgs with
-    | status ->
-      let status =
-        if OpamStateConfig.(!r.no_depexts) then
-          (* Mark all as available. This is necessary to store the exceptions
-             afterwards *)
-          { OpamSysPkg.status_empty with
-            s_available = status.s_available ++ status.s_not_found; }
-        else if OpamFile.Config.depext_cannot_install global_config then
-          { OpamSysPkg.status_empty with
-            s_not_found = status.s_available ++ status.s_not_found; }
-        else
-          status
-      in
-      OpamPackage.Map.map (fun set ->
-          { OpamSysPkg.
-            s_available = set %% status.s_available;
-            s_not_found = set %% status.s_not_found })
-        syspkg_map
-    | exception (Failure msg) ->
-      OpamConsole.note "%s\nYou can disable this check using 'opam \
-                        option --global depext=false'"
-        msg;
-      OpamPackage.Map.empty
-  in
-  log "depexts loaded in %.3fs" (chronos());
-  ret
+    let open OpamSysPkg.Set.Op in
+    let syspkg_set, syspkg_map =
+      OpamPackage.Set.fold (fun nv (set, map) ->
+          let s = depexts nv in
+          s ++ set,
+          if OpamSysPkg.Set.is_empty s then map
+          else OpamPackage.Map.add nv s map)
+        packages (OpamSysPkg.Set.empty, OpamPackage.Map.empty)
+    in
+    let chronos = OpamConsole.timer () in
+    let bypass =
+      OpamFile.Config.depext_bypass global_config ++
+      switch_config.OpamFile.Switch_config.depext_bypass
+    in
+    let syspkg_set = syspkg_set -- bypass in
+    let ret =
+      match depexts_status ?env global_config syspkg_set repos_sys_available_pkgs with
+      | status ->
+        let status =
+          if OpamStateConfig.(!r.no_depexts) then
+            (* Mark all as available. This is necessary to store the exceptions
+               afterwards *)
+            { OpamSysPkg.status_empty with
+              s_available = status.s_available ++ status.s_not_found; }
+          else if OpamFile.Config.depext_cannot_install global_config then
+            { OpamSysPkg.status_empty with
+              s_not_found = status.s_available ++ status.s_not_found; }
+          else
+            status
+        in
+        OpamPackage.Map.map (fun set ->
+            { OpamSysPkg.
+              s_available = set %% status.s_available;
+              s_not_found = set %% status.s_not_found })
+          syspkg_map
+      | exception (Failure msg) ->
+        OpamConsole.note "%s\nYou can disable this check using 'opam \
+                          option --global depext=false'"
+          msg;
+        OpamPackage.Map.empty
+    in
+    log "depexts loaded in %.3fs" (chronos());
+    ret
 
 let depexts_unavailable_raw sys_packages nv =
   match OpamPackage.Map.find_opt nv sys_packages with
@@ -539,8 +539,8 @@ let load lock_kind gt rt switch =
     || OpamStateConfig.(!r.no_depexts) then
       lazy OpamPackage.Map.empty
     else lazy (
-      depexts_status_of_packages_raw rt.repos_sys_available_pkgs gt.config switch_config
-        ~env:gt.global_variables
+      depexts_status_of_packages_raw rt.repos_sys_available_pkgs gt.config 
+        switch_config  ~env:gt.global_variables
         (Lazy.force available_packages)
         ~depexts:(fun package ->
             let env =
