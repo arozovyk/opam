@@ -1600,20 +1600,11 @@ let update_with_init_config ?(overwrite=false) config init_config =
   setifnew C.git_location C.with_git_location_opt
     (I.git_location init_config)
 
-let check_for_sys_packages config rt system_packages =
-  let sys_available =
-    OpamRepositoryState.get_repo_available_depexts rt 
-  in 
+let check_for_sys_packages ~env config system_packages =
   if system_packages <> [] then
     let status =
-      OpamSysInteract.packages_status 
-        ~sys_available:(
-          if OpamSysPkg.Set.is_empty sys_available then 
-            OpamSysPkg.Suppose_available
-          else 
-            OpamSysPkg.Available sys_available)
-        config
-        (OpamSysPkg.Set.of_list system_packages)
+      let s_pks_set = OpamSysPkg.Set.of_list system_packages in
+      OpamSysInteract.packages_status ~env config s_pks_set
     in
     if not (OpamSysPkg.Set.is_empty status.s_available) then
       let vars = OpamFile.Config.global_variables config in
@@ -1678,7 +1669,7 @@ let reinit ?(init_config=OpamInitDefaults.init_config()) ~interactive
   let gt = OpamGlobalState.load `Lock_write in
   let rt = OpamRepositoryState.load `Lock_write gt in
 
-  check_for_sys_packages config rt system_packages;
+  check_for_sys_packages ~env:gt.global_variables config system_packages;
 
   let _failed, rt =
     OpamRepositoryCommand.update_with_auto_upgrade rt
@@ -1914,7 +1905,7 @@ let init
         let gt = OpamGlobalState.load `Lock_write in
         let rt = OpamRepositoryState.load `Lock_write gt in
 
-        check_for_sys_packages config rt system_packages;
+        check_for_sys_packages ~env:gt.global_variables config system_packages;
 
         log "updating repository state";
         OpamConsole.header_msg "Fetching repository information";
