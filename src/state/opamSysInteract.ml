@@ -1245,7 +1245,7 @@ let available_packages ?(env=OpamVariable.Map.empty) config packages =
     *)
     Suppose_available
   | Openbsd -> Suppose_available
-
+  
 let packages_status ?(env=OpamVariable.Map.empty) ?sys_available config syspkg_set =
   log "calling new depexts status";
   let open OpamSysPkg.Set.Op in
@@ -1254,7 +1254,6 @@ let packages_status ?(env=OpamVariable.Map.empty) ?sys_available config syspkg_s
     match sys_available with 
       Some sys_available -> sys_available
     | None ->
-      (* TODO: remove when repo_enablers is investigated *)
       available_packages ~env config syspkg_set 
   in 
   match sys_available with
@@ -1551,17 +1550,18 @@ let update ?(env=OpamVariable.Map.empty) config =
     try sudo_run_command ~env cmd args
     with Failure msg -> failwith ("System package update " ^ msg)
 
-let repo_enablers ?(env=OpamVariable.Map.empty) config =
+let repo_enablers ?(env=OpamVariable.Map.empty) config   =
   if family ~env () <> Centos then None else
-  let status =
-    packages_status ~env config
-      (OpamSysPkg.raw_set
-         (OpamStd.String.Set.singleton "epel-release"))
-  in
-  if OpamSysPkg.Set.is_empty status.s_available then None
-  else
-    Some
+    let epel_release_pkg = (OpamSysPkg.of_string "epel-release"|> OpamSysPkg.Set.singleton) in 
+    let msg = 
       "On CentOS/RHEL, many packages may assume that the Extra Packages for \
        Enterprise Linux (EPEL) repository has been enabled. \
        This is typically done by installing the 'epel-release' package. \
-       Please see https://fedoraproject.org/wiki/EPEL for more information"
+       Please see https://fedoraproject.org/wiki/EPEL for more information" 
+    in 
+    match available_packages ~env config epel_release_pkg with 
+    | Suppose_available -> Some msg
+    | Available av -> 
+      if OpamSysPkg.Set.equal av epel_release_pkg 
+      then Some msg
+      else None  
