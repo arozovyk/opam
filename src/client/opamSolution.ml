@@ -1145,6 +1145,7 @@ let print_depext_msg (status : OpamSysPkg.status) =
    true. *)
 let get_depexts ?(force=false) ?(recover=false) t
     ~pkg_to_install ~pkg_installed =
+   
   if not force && OpamStateConfig.(!r.no_depexts) then
     OpamSysPkg.to_install_empty
   else
@@ -1152,7 +1153,7 @@ let get_depexts ?(force=false) ?(recover=false) t
       if recover then
         OpamSwitchState.depexts_status_of_packages t pkg_to_install
       else
-        let base = Lazy.force t.sys_packages in
+        (* let base = Lazy.force t.sys_packages in
         (* workaround: st.sys_packages is not always updated with added
            packages *)
         let more_pkgs =
@@ -1163,8 +1164,9 @@ let get_depexts ?(force=false) ?(recover=false) t
             pkg_to_install
         in
         if OpamPackage.Set.is_empty more_pkgs then base else
-          OpamPackage.Map.union (fun _ x -> x) base
-            (OpamSwitchState.depexts_status_of_packages t more_pkgs)
+          OpamPackage.Map.union (fun x _ -> x) base
+            (OpamSwitchState.depexts_status_of_packages t more_pkgs) *),
+            Lazy.force t.sys_packages
     in
     let already_installed = OpamPackage.Set.diff pkg_installed pkg_to_install in
     let open OpamSysPkg.Set.Op in
@@ -1395,7 +1397,7 @@ let apply ?ask t ~requested ?print_requested ?add_roots
         t
         (* Prints the msg about additional depexts to install *)
       else
-        install_depexts t ~pkg_to_install:virt_inst ~pkg_installed:t.installed
+       install_depexts t ~pkg_to_install:virt_inst ~pkg_installed:t.installed 
     in
     t, Nothing_to_do
   else (

@@ -2298,6 +2298,30 @@ let install_t t ?ask ?(ignore_conflicts=false) ?(depext_only=false)
     OpamPackage.Name.Set.of_list (List.rev_map fst (atoms @ deps_atoms))
   in
   let packages = OpamFormula.packages_of_atoms t.packages (atoms @ deps_atoms) in
+   let depexts_s = OpamPackage.Set.fold 
+      (fun p acc -> OpamSysPkg.Set.Op.(OpamSwitchState.depexts t p ++ acc)) 
+      packages OpamSysPkg.Set.empty 
+  in
+  let t =
+    if OpamSysPkg.Set.is_empty depexts_s then
+      t 
+    else 
+      (* Check if an update is to be made *)
+      let repo_depexts =
+        OpamRepositoryState.get_repo_available_depexts t.switch_repos 
+      in 
+      if OpamSysPkg.Set.is_empty repo_depexts || 
+         (not (OpamSysPkg.Set.subset depexts_s repo_depexts)) then
+        let sys_packages = lazy (
+          OpamPackage.Map.union (fun _ n -> n)
+            (Lazy.force t.sys_packages)
+            (OpamSwitchState.depexts_status_of_packages ~recompute_available:true
+               t packages)
+        ) in
+        {t with sys_packages}
+      else 
+        t 
+  in
   let solution =
     let reinstall = if assume_built then Some pkg_reinstall else None in
     OpamSolution.resolve t Install
