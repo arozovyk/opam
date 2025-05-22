@@ -178,7 +178,7 @@ module Installed_cache = OpamCached.Make(struct
     let name = "installed"
   end)
 
-let depexts_status ?env global_config syspkg_set repos_sys_available_pkgs = 
+let depexts_status ?env global_config repos_sys_available_pkgs syspkg_set = 
   let open OpamSysPkg.Set.Op in
   let installed = OpamSysInteract.installed_packages ?env global_config syspkg_set in  
   try 
@@ -201,7 +201,8 @@ let depexts_status ?env global_config syspkg_set repos_sys_available_pkgs =
     { OpamSysPkg.status_empty with s_available }
 
 let depexts_status_of_packages_raw
-    repos_sys_available_pkgs ~depexts ?env global_config switch_config packages =
+    repos_sys_available_pkgs ~depexts ?(recompute_available=false) ?env
+    global_config switch_config packages =
   if OpamPackage.Set.is_empty packages then OpamPackage.Map.empty else
     let open OpamSysPkg.Set.Op in
     let syspkg_set, syspkg_map =
@@ -218,8 +219,14 @@ let depexts_status_of_packages_raw
       switch_config.OpamFile.Switch_config.depext_bypass
     in
     let syspkg_set = syspkg_set -- bypass in
+    let status syspkg_set = 
+      if recompute_available then 
+        depexts_status ?env global_config repos_sys_available_pkgs syspkg_set
+      else 
+        OpamSysInteract.packages_status ?env global_config syspkg_set
+    in 
     let ret =
-      match depexts_status ?env global_config syspkg_set repos_sys_available_pkgs with
+      match status syspkg_set with
       | status ->
         let status =
           if OpamStateConfig.(!r.no_depexts) then
@@ -798,8 +805,9 @@ let depexts st nv =
   let env v = OpamPackageVar.resolve_switch ~package:nv st v in
  depexts_raw ~env nv st.opams
 
-let depexts_status_of_packages st set =
-  depexts_status_of_packages_raw st.switch_repos.repos_sys_available_pkgs 
+let depexts_status_of_packages ?recompute_available st set =
+  depexts_status_of_packages_raw ?recompute_available 
+    st.switch_repos.repos_sys_available_pkgs 
     st.switch_global.config st.switch_config set
     ~env:st.switch_global.global_variables ~depexts:(depexts st)
 

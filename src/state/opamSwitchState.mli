@@ -186,9 +186,12 @@ val reverse_dependencies:
   installed:bool -> unavailable:bool -> package_set -> package_set
 
 (** Returns required system packages of each of the given packages (elements are
-    not added to the map  if they don't have system dependencies) *)
+    not added to the map  if they don't have system dependencies). 
+    [recompute_available] indicates if a syscall is to be made instead of using 
+    the repositories depexts cf. {!OpamRepositoryState.get_repo_available_depexts}. *)
 val depexts_status_of_packages:
-  'a switch_state -> package_set -> OpamSysPkg.status package_map
+  ?recompute_available:bool -> 'a switch_state -> package_set ->
+  OpamSysPkg.status package_map
 
 (** Returns not found depexts for the package *)
 val depexts_unavailable: 'a switch_state -> package -> OpamSysPkg.Set.t option
