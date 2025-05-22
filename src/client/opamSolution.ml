@@ -1169,7 +1169,7 @@ let get_depexts ?(force=false) ?(recover=false) t
         in
         Printf.printf "\n More pkg %d .\n " ( OpamPackage.Set.cardinal more_pkgs);
         if OpamPackage.Set.is_empty more_pkgs then base else
-          OpamPackage.Map.union (fun _ x -> x) base
+          OpamPackage.Map.union (fun x _ -> x) base
             (OpamSwitchState.depexts_status_of_packages t more_pkgs)
     in
     let already_installed = OpamPackage.Set.diff pkg_installed pkg_to_install in
