@@ -221,9 +221,9 @@ let depexts_status_of_packages_raw
     let syspkg_set = syspkg_set -- bypass in
     let status syspkg_set = 
       if recompute_available then 
-        depexts_status ?env global_config repos_sys_available_pkgs syspkg_set
-      else 
         OpamSysInteract.packages_status ?env global_config syspkg_set
+      else 
+        depexts_status ?env global_config repos_sys_available_pkgs syspkg_set
     in 
     let ret =
       match status syspkg_set with
@@ -547,7 +547,7 @@ let load lock_kind gt rt switch =
       lazy OpamPackage.Map.empty
     else lazy (
       depexts_status_of_packages_raw rt.repos_sys_available_pkgs gt.config 
-        switch_config  ~env:gt.global_variables
+        switch_config ~env:gt.global_variables
         (Lazy.force available_packages)
         ~depexts:(fun package ->
             let env =
