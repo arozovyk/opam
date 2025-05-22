@@ -545,6 +545,31 @@ let autopin st ?(simulate=false) ?quiet ?locked ?recurse ?subpath
     else
       OpamUpdate.dev_packages st ~working_dir:OpamPackage.Set.empty already_pinned
   in
+  (* Check if pinned packages contain depexts and add them to st *)
+  let depexts_s = OpamPackage.Set.fold 
+      (fun p acc -> OpamSysPkg.Set.Op.(OpamSwitchState.depexts st p ++ acc)) 
+      pins OpamSysPkg.Set.empty 
+  in
+  let st =
+    if OpamSysPkg.Set.is_empty depexts_s then
+      st 
+    else 
+      (* Check if an update is to be made *)
+      let repo_depexts =
+        OpamRepositoryState.get_repo_available_depexts st.switch_repos 
+      in 
+      if OpamSysPkg.Set.is_empty repo_depexts || 
+         (not (OpamSysPkg.Set.subset depexts_s repo_depexts)) then
+        let sys_packages = lazy (
+          OpamPackage.Map.union (fun _ n -> n)
+            (Lazy.force st.sys_packages)
+            (OpamSwitchState.depexts_status_of_packages ~recompute_available:true
+               st pins)
+        ) in
+        {st with sys_packages}
+      else 
+        st 
+  in
   st, simulate_pinned_atoms pins atoms
 
 let check_and_revert_sandboxing root config =
