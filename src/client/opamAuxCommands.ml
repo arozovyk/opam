@@ -561,10 +561,13 @@ let autopin st ?(simulate=false) ?quiet ?locked ?recurse ?subpath
       if OpamSysPkg.Set.is_empty repo_depexts || 
          (not (OpamSysPkg.Set.subset depexts_s repo_depexts)) then
         let sys_packages = lazy (
-          OpamPackage.Map.union (fun _ n -> n)
+          let s = (OpamSwitchState.depexts_status_of_packages ~recompute_available:true
+               st pins) in 
+          let c= OpamPackage.Map.union (fun _ n -> n)
             (Lazy.force st.sys_packages)
-            (OpamSwitchState.depexts_status_of_packages ~recompute_available:true
-               st pins)
+            s in
+            Printf.printf "card c %d ." (OpamPackage.Map.cardinal c);c 
+
         ) in
         {st with sys_packages}
       else 

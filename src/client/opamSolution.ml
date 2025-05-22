@@ -1155,6 +1155,11 @@ let get_depexts ?(force=false) ?(recover=false) t
         let base = Lazy.force t.sys_packages in
         (* workaround: st.sys_packages is not always updated with added
            packages *)
+        Printf.printf "\n base %d .\n " ( OpamPackage.Map.cardinal base);
+        let sys = (base|> OpamPackage.Map.find_first (fun _ -> true) |> snd) in 
+        Printf.printf "OpamSolution.base av %d nf %d . "
+          (OpamSysPkg.Set.cardinal sys.s_available)(OpamSysPkg.Set.cardinal sys.s_not_found);
+
         let more_pkgs =
           OpamPackage.Set.filter (fun nv ->
               (* dirty heuristic: recompute for all non-canonical packages *)
@@ -1162,6 +1167,7 @@ let get_depexts ?(force=false) ?(recover=false) t
               <> OpamSwitchState.opam_opt t nv)
             pkg_to_install
         in
+        Printf.printf "\n More pkg %d .\n " ( OpamPackage.Set.cardinal more_pkgs);
         if OpamPackage.Set.is_empty more_pkgs then base else
           OpamPackage.Map.union (fun _ x -> x) base
             (OpamSwitchState.depexts_status_of_packages t more_pkgs)
@@ -1172,6 +1178,13 @@ let get_depexts ?(force=false) ?(recover=false) t
       OpamPackage.Set.fold (fun pkg (acc : OpamSysPkg.status) ->
           match OpamPackage.Map.find_opt pkg sys_packages with
           | Some sys ->
+            Printf.printf "\nOpamSolution.acc av %d nf %d .\n " 
+              OpamSysPkg.(OpamSysPkg.Set.cardinal acc.s_available)
+              OpamSysPkg.(OpamSysPkg.Set.cardinal acc.s_not_found);
+            Printf.printf "\nOpamSolution.sys av %d nf %d .\n " 
+              OpamSysPkg.(OpamSysPkg.Set.cardinal sys.s_available)
+              OpamSysPkg.(OpamSysPkg.Set.cardinal sys.s_not_found);
+
             { OpamSysPkg.
               s_available = acc.s_available ++ sys.s_available;
               s_not_found = acc.s_not_found ++ sys.s_not_found;
@@ -1179,6 +1192,7 @@ let get_depexts ?(force=false) ?(recover=false) t
           | None -> acc)
         pkg_to_install OpamSysPkg.status_empty
     in
+
     print_depext_msg status;
     let ti_required =
       let bypass = t.switch_config.OpamFile.Switch_config.depext_bypass in
@@ -1380,7 +1394,9 @@ let apply ?ask t ~requested ?print_requested ?add_roots
     OpamSolver.filter_solution ~recursive:false
       (fun nv -> not (OpamPackage.Map.mem nv skip))
       solution0
-  in
+  in 
+  let sys = (Lazy.force t.sys_packages |> OpamPackage.Map.find_first (fun _ -> true) |> snd) in 
+  Printf.printf "OpamSolution.apply av %d nf %d . " (OpamSysPkg.Set.cardinal sys.s_available)(OpamSysPkg.Set.cardinal sys.s_not_found);
   if OpamSolver.solution_is_empty solution then
     (* The current state satisfies the request contraints,
        but there might be depexts missing *)
