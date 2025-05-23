@@ -2209,6 +2209,37 @@ let install_t t ?ask ?(ignore_conflicts=false) ?(depext_only=false)
           nvs (t, deps_of_packages))
       dname_map (t, OpamPackage.Set.empty)
   in
+  let more_pkgs =
+    OpamPackage.Set.filter (fun nv ->
+        (* dirty heuristic: recompute for all non-canonical packages *)
+        OpamPackage.Map.find_opt nv t.repos_package_index
+        <> OpamSwitchState.opam_opt t nv)
+      deps_of_packages
+  in
+  let depexts_s = OpamPackage.Set.fold 
+      (fun p acc -> OpamSysPkg.Set.Op.(OpamSwitchState.depexts t p ++ acc)) 
+      more_pkgs OpamSysPkg.Set.empty 
+  in
+  let t =
+    if OpamSysPkg.Set.is_empty depexts_s then
+      t 
+    else 
+      (* Check if an update is to be made *)
+      let repo_depexts =
+        OpamRepositoryState.get_repo_available_depexts t.switch_repos 
+      in 
+      if OpamSysPkg.Set.is_empty repo_depexts || 
+         (not (OpamSysPkg.Set.subset depexts_s repo_depexts)) then
+        let sys_packages = lazy (
+          OpamPackage.Map.union (fun _ n -> n)
+            (Lazy.force t.sys_packages)
+            (OpamSwitchState.depexts_status_of_packages ~recompute_available:true
+               t more_pkgs)
+        ) in
+        {t with sys_packages}
+      else 
+        t 
+  in
   let pkg_skip, pkg_new =
     get_installed_atoms t atoms in
   let atoms, deps_atoms =
