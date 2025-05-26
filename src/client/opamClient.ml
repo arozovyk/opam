@@ -2592,11 +2592,25 @@ module PIN = struct
             s names)
       |> OpamPackage.Name.Set.elements
     in
+    let sys_packages = 
+      if OpamPackage.Set.exists (fun p -> 
+          not (OpamSwitchState.depexts st p |> OpamSysPkg.Set.is_empty) 
+        ) was_pinned then
+        lazy (
+          OpamPackage.Map.union (fun _ n -> n)
+            (Lazy.force st.sys_packages)
+            (OpamSwitchState.depexts_status_of_packages ~recompute_available:true
+               st was_pinned)
+        )  
+      else 
+        st.sys_packages
+    in
+    let st = {st with sys_packages} in 
     try
       upgrade_t
         ~strict_upgrade:false ~auto_install:true ~ask:true ~terse:true
         ~all:false
-       (List.map (fun name -> name, None) names) st
+        (List.map (fun name -> name, None) names) st
     with e ->
       OpamConsole.note
         "Pinning command successful, but your installed packages \

@@ -338,7 +338,7 @@ let load lock_kind gt rt switch =
           let o = OpamFile.OPAM.with_version version o in
           OpamPackage.Set.add nv pinned,
           OpamPackage.Map.add nv o opams,
-          (not @@ List.is_empty (OpamFile.OPAM.depexts o) || has_depexts)
+          (not @@ (List.length (OpamFile.OPAM.depexts o) != 0) || has_depexts)
       )
       pinned (OpamPackage.Set.empty, OpamPackage.Map.empty, false)
   in
@@ -1298,16 +1298,17 @@ let update_pin nv opam st =
   if not (OpamFile.Config.depext st.switch_global.config)
   || OpamSysPkg.Set.is_empty (depexts st nv)
   then st else
-  let sys_packages = lazy (
-    OpamPackage.Map.union (fun _ n -> n)
-      (Lazy.force st.sys_packages)
-      (depexts_status_of_packages st (OpamPackage.Set.singleton nv))
-  ) in
-  let available_packages = lazy (
-    OpamPackage.Set.filter (fun nv -> depexts_unavailable st nv = None)
-      (Lazy.force st.available_packages)
-  ) in
-  { st with sys_packages; available_packages }
+    let sys_packages = lazy (
+      OpamPackage.Map.union (fun _ n -> n)
+        (Lazy.force st.sys_packages)
+        (depexts_status_of_packages ~recompute_available:true 
+           st (OpamPackage.Set.singleton nv))
+    ) in
+    let available_packages = lazy (
+      OpamPackage.Set.filter (fun nv -> depexts_unavailable st nv = None)
+        (Lazy.force st.available_packages)
+    ) in
+    { st with sys_packages; available_packages }
 
 let do_backup lock st = match lock with
   | `Lock_write ->
