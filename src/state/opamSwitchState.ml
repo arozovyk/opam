@@ -261,6 +261,10 @@ let depexts_unavailable_raw sys_packages nv =
     Some s_not_found
   | _ -> None
 
+let depexts st nv =
+  let env v = OpamPackageVar.resolve_switch ~package:nv st v in
+ depexts_raw ~env nv st.opams
+
 let load lock_kind gt rt switch =
   OpamFormatUpgrade.as_necessary_repo_switch_light_upgrade lock_kind `Switch gt;
   let chrono = OpamConsole.timer () in
@@ -309,14 +313,14 @@ let load lock_kind gt rt switch =
         sel_pinned = pinned; sel_compiler = compiler_packages; } =
     load_selections ~lock_kind gt switch
   in
-  let pinned, pinned_opams =
-    OpamPackage.Set.fold (fun nv (pinned,opams) ->
+  let pinned, pinned_opams, has_pinned_depexts =
+    OpamPackage.Set.fold (fun nv (pinned,opams, has_depexts) ->
         let overlay_dir =
           OpamPath.Switch.Overlay.package gt.root switch nv.name
         in
         match OpamFileTools.read_opam overlay_dir with
         | None -> (* No overlay => just pinned to a version *)
-          OpamPackage.Set.add nv pinned, opams
+          OpamPackage.Set.add nv pinned, opams, has_depexts
         | Some o ->
           let version =
             match OpamFile.OPAM.version_opt o with
@@ -333,9 +337,10 @@ let load lock_kind gt rt switch =
           let nv = OpamPackage.create nv.name version in
           let o = OpamFile.OPAM.with_version version o in
           OpamPackage.Set.add nv pinned,
-          OpamPackage.Map.add nv o opams
+          OpamPackage.Map.add nv o opams,
+          (not @@ List.is_empty (OpamFile.OPAM.depexts o) || has_depexts)
       )
-      pinned (OpamPackage.Set.empty, OpamPackage.Map.empty)
+      pinned (OpamPackage.Set.empty, OpamPackage.Map.empty, false)
   in
   let installed_opams =
     let cache_file = OpamPath.Switch.installed_opams_cache gt.root switch in
@@ -546,13 +551,8 @@ let load lock_kind gt rt switch =
     || OpamStateConfig.(!r.no_depexts) then
       lazy OpamPackage.Map.empty
     else lazy (
-      let recompute_available =
-        OpamPackage.Map.exists (fun _ o ->
-            not (List.is_empty (OpamFile.OPAM.depexts o))
-          ) pinned_opams 
-      in    
       depexts_status_of_packages_raw 
-        ~recompute_available
+        ~recompute_available:has_pinned_depexts
         rt.repos_sys_available_pkgs gt.config 
         switch_config ~env:gt.global_variables
         (Lazy.force available_packages)
@@ -807,10 +807,6 @@ let source_dir st nv =
   if OpamPackage.Set.mem nv st.pinned
   then OpamPath.Switch.pinned_package st.switch_global.root st.switch nv.name
   else OpamPath.Switch.sources st.switch_global.root st.switch nv
-
-let depexts st nv =
-  let env v = OpamPackageVar.resolve_switch ~package:nv st v in
- depexts_raw ~env nv st.opams
 
 let depexts_status_of_packages ?recompute_available st set =
   depexts_status_of_packages_raw ?recompute_available 
