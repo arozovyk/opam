@@ -1141,19 +1141,12 @@ let print_depext_msg (status : OpamSysPkg.status) =
      OpamConsole.formatted_msg ~indent:4 "    %s\n"
        (syspkgs_to_string status.s_available))
 
-(* Gets depexts from the state, without checking again, unless [recover] is
-   true. *)
-let get_depexts ?(force=false) ?(recover=false) t
-    ~pkg_to_install ~pkg_installed =
+(* Gets depexts from the state *)
+let get_depexts ?(force=false) t ~pkg_to_install ~pkg_installed =
   if not force && OpamStateConfig.(!r.no_depexts) then
     OpamSysPkg.to_install_empty
   else
-    let sys_packages =
-      if recover then
-        OpamSwitchState.depexts_status_of_packages t pkg_to_install
-      else
-        Lazy.force t.sys_packages
-    in
+    let sys_packages = Lazy.force t.sys_packages in
     let already_installed = OpamPackage.Set.diff pkg_installed pkg_to_install in
     let open OpamSysPkg.Set.Op in
     let status =
@@ -1343,8 +1336,7 @@ let install_depexts ?(force_depext=false) ?(confirm=true) t
     confirm && not (OpamSysInteract.Cygwin.is_internal t.switch_global.config)
   in
   let sys_packages =
-    get_depexts ~force:force_depext ~recover:force_depext t
-      ~pkg_to_install ~pkg_installed
+    get_depexts ~force:force_depext t ~pkg_to_install ~pkg_installed
   in
   let env = t.switch_global.global_variables in
   let config = t.switch_global.config in
