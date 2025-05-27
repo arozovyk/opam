@@ -489,9 +489,8 @@ let installed_packages ?(env=OpamVariable.Map.empty) config packages =
   (* Some package managers don't permit to request on available packages. In
      this case, we consider all non installed packages as [available]. *)
   let open OpamSysPkg.Set.Op in
-  let get_relevant (* ?sys_available *) sys_installed =
+  let get_relevant sys_installed =
     packages %% sys_installed 
-
   in
   let to_string_list pkgs =
     OpamSysPkg.(Set.fold (fun p acc -> to_string p :: acc) pkgs [])
@@ -594,7 +593,7 @@ let installed_packages ?(env=OpamVariable.Map.empty) config packages =
               let provides =
                 match latest with
                 | Some p -> OpamSysPkg.Map.add p ps provides
-                | None -> provides (* Bad pacman output ?? *)
+                | None -> provides (* FIXME: Bad pacman output ?? *)
               in
               ps ++ avail, provides, None
             | _ -> acc

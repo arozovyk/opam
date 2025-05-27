@@ -1102,7 +1102,7 @@ let run_test ?(vars=[]) ~opam t =
              in
              diffl [] (String.split_on_char '\n' r) out);
           OpamStd.Option.iter (Printf.printf "# Return code %d #\n") errcode;
-          ( match output with
+          (match output with
             | None -> vars
             | Some v -> (v, r) :: List.filter (fun (w,_) -> v <> w) vars)
         | Set_os os ->
