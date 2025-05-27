@@ -1344,7 +1344,6 @@ let install_depexts ?(force_depext=false) ?(confirm=true) t
     env config sys_packages t
 
 let install_sys_packages ~confirm =
-  (*TODO : poly variant ? *)
   install_sys_packages_t ~propagate_st:(fun () -> None)
     ~map_sysmap:(fun _ () -> ()) ~confirm
 
