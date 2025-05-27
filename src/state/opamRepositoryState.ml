@@ -159,7 +159,6 @@ let get_repo_root rt repo =
   get_root_raw rt.repos_global.root rt.repos_tmp repo.repo_name
 
 let get_repo_available_depexts rt =
-  (* TODO: make it clear from outside as of why this returns an empty set (Suppose_available) *)
   OpamRepositoryName.Map.fold (fun _ ra acc ->  
       match ra with 
         OpamSysPkg.Available sys_pkgs -> OpamSysPkg.Set.Op.(sys_pkgs ++ acc)
