@@ -313,14 +313,14 @@ let load lock_kind gt rt switch =
         sel_pinned = pinned; sel_compiler = compiler_packages; } =
     load_selections ~lock_kind gt switch
   in
-  let pinned, pinned_opams, has_pinned_depexts =
-    OpamPackage.Set.fold (fun nv (pinned,opams, has_depexts) ->
+  let pinned, pinned_opams, depexpts_present_pins =
+    OpamPackage.Set.fold (fun nv (pinned,opams, depexpts_present) ->
         let overlay_dir =
           OpamPath.Switch.Overlay.package gt.root switch nv.name
         in
         match OpamFileTools.read_opam overlay_dir with
         | None -> (* No overlay => just pinned to a version *)
-          OpamPackage.Set.add nv pinned, opams, has_depexts
+          OpamPackage.Set.add nv pinned, opams, depexpts_present
         | Some o ->
           let version =
             match OpamFile.OPAM.version_opt o with
@@ -338,7 +338,7 @@ let load lock_kind gt rt switch =
           let o = OpamFile.OPAM.with_version version o in
           OpamPackage.Set.add nv pinned,
           OpamPackage.Map.add nv o opams,
-          (not @@ (List.length (OpamFile.OPAM.depexts o) != 0) || has_depexts)
+          (not @@ (List.length (OpamFile.OPAM.depexts o) != 0) || depexpts_present)
       )
       pinned (OpamPackage.Set.empty, OpamPackage.Map.empty, false)
   in
@@ -552,7 +552,7 @@ let load lock_kind gt rt switch =
       lazy OpamPackage.Map.empty
     else lazy (
       depexts_status_of_packages_raw 
-        ~recompute_available:has_pinned_depexts
+        ~recompute_available:depexpts_present_pins
         rt.repos_sys_available_pkgs gt.config 
         switch_config ~env:gt.global_variables
         (Lazy.force available_packages)
