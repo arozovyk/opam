@@ -196,6 +196,10 @@ val depexts_status_of_packages:
 (** Returns not found depexts for the package *)
 val depexts_unavailable: 'a switch_state -> package -> OpamSysPkg.Set.t option
 
+(** [depexts_update st pkgs] Updates depext package statuses declared in [pkgs]. 
+    Used for pinning. *)
+val depexts_update : 'a switch_state -> package_set -> 'a switch_state
+
 (** [conflicts_with st subset pkgs] returns all packages declared in conflict
     with at least one element of [subset] within [pkgs], through forward or
     backward conflict definition or common conflict-class. Packages in [subset]

@@ -2209,29 +2209,8 @@ let install_t t ?ask ?(ignore_conflicts=false) ?(depext_only=false)
           nvs (t, deps_of_packages))
       dname_map (t, OpamPackage.Set.empty)
   in
-  let depexts_s = OpamPackage.Set.fold 
-      (fun p acc -> OpamSysPkg.Set.Op.(OpamSwitchState.depexts t p ++ acc)) 
-      deps_of_packages OpamSysPkg.Set.empty 
-  in
   let t =
-    if OpamSysPkg.Set.is_empty depexts_s then
-      t 
-    else 
-      (* Check if an update is to be made *)
-      let repo_depexts =
-        OpamRepositoryState.get_repo_available_depexts t.switch_repos 
-      in 
-      if OpamSysPkg.Set.is_empty repo_depexts || 
-         (not (OpamSysPkg.Set.subset depexts_s repo_depexts)) then
-        let sys_packages = lazy (
-          OpamPackage.Map.union (fun _ n -> n)
-            (Lazy.force t.sys_packages)
-            (OpamSwitchState.depexts_status_of_packages ~recompute_available:true
-               t deps_of_packages)
-        ) in
-        {t with sys_packages}
-      else 
-        t 
+    OpamSwitchState.depexts_update t deps_of_packages
   in
   let pkg_skip, pkg_new =
     get_installed_atoms t atoms in
@@ -2585,20 +2564,6 @@ module PIN = struct
             s names)
       |> OpamPackage.Name.Set.elements
     in
-    let sys_packages = 
-      if OpamPackage.Set.exists (fun p -> 
-          not (OpamSwitchState.depexts st p |> OpamSysPkg.Set.is_empty) 
-        ) was_pinned then
-        lazy (
-          OpamPackage.Map.union (fun _ n -> n)
-            (Lazy.force st.sys_packages)
-            (OpamSwitchState.depexts_status_of_packages ~recompute_available:true
-               st was_pinned)
-        )  
-      else 
-        st.sys_packages
-    in
-    let st = {st with sys_packages} in 
     try
       upgrade_t
         ~strict_upgrade:false ~auto_install:true ~ask:true ~terse:true

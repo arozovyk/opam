@@ -817,6 +817,30 @@ let depexts_status_of_packages ?recompute_available st set =
 let depexts_unavailable st nv =
   depexts_unavailable_raw (Lazy.force st.sys_packages) nv
 
+let depexts_update st packages = 
+  let depexts_s = OpamPackage.Set.fold 
+      (fun p acc -> OpamSysPkg.Set.Op.(depexts st p ++ acc)) 
+      packages OpamSysPkg.Set.empty 
+  in
+  if OpamSysPkg.Set.is_empty depexts_s then
+    st 
+  else 
+    (* Check if an update is to be made *)
+    let available_depexts =
+      OpamRepositoryState.get_repo_available_depexts st.switch_repos
+    in
+    if OpamSysPkg.Set.is_empty available_depexts || 
+       (not (OpamSysPkg.Set.subset depexts_s available_depexts)) then
+      let sys_packages = lazy (
+        OpamPackage.Map.union (fun _ new_val -> new_val)
+          (Lazy.force st.sys_packages)
+          (depexts_status_of_packages
+             ~recompute_available:true st packages)
+      ) in
+      {st with sys_packages}
+    else 
+      st 
+
 let dev_packages st =
   OpamPackage.Set.filter (is_dev_package st)
     (st.installed ++ OpamPinned.packages st)
