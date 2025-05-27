@@ -1003,6 +1003,8 @@ roots: ["i-am-package.2" "i-am-sys-compiler.2"]
 ### ocaml generate.ml 2.0
 ### opam init --reinit --bypass-checks --no-setup | "${OPAMROOTVERSION}($|,)" -> "current" | grep -v Cygwin
 No configuration file found, using built-in defaults.
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 [WARNING] Removing global switch 'this-internal-error' as it no longer exists
 FMT_UPG                         Light config upgrade, from 2.0 to current
@@ -1016,8 +1018,6 @@ Format upgrade done.
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 RSTATE                          loaded opam files from repo default in 0.000s
-
-<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 [default] no changes from file://${BASEDIR}/default
 ### opam switch --short
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
@@ -1067,12 +1067,12 @@ Perform the update and continue? [Y/n] y
 Format upgrade done.
 
 <><> Rerunning init and update ><><><><><><><><><><><><><><><><><><><><><><><><>
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 RSTATE                          loaded opam files from repo default in 0.000s
-
-<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 [default] no changes from file://${BASEDIR}/default
 Update done, please now retry your command.
 # Return code 10 #
@@ -1158,12 +1158,12 @@ Perform the update and continue? [Y/n] y
 Format upgrade done.
 
 <><> Rerunning init and update ><><><><><><><><><><><><><><><><><><><><><><><><>
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 RSTATE                          loaded opam files from repo default in 0.000s
-
-<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 [default] no changes from file://${BASEDIR}/default
 Update done, please now retry your command.
 # Return code 10 #
@@ -1233,12 +1233,12 @@ Perform the update and continue? [Y/n] y
 Format upgrade done.
 
 <><> Rerunning init and update ><><><><><><><><><><><><><><><><><><><><><><><><>
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 RSTATE                          loaded opam files from repo default in 0.000s
-
-<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 [default] no changes from file://${BASEDIR}/default
 Update done, please now retry your command.
 # Return code 10 #
@@ -1363,6 +1363,8 @@ roots: ["i-am-package.2" "i-am-sys-compiler.2"]
 ### ocaml generate.ml 2.1~alpha
 ### opam init --reinit --bypass-checks --no-setup | "${OPAMROOTVERSION}($|,)" -> "current" | grep -v Cygwin
 No configuration file found, using built-in defaults.
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 [WARNING] Removing global switch 'this-internal-error' as it no longer exists
 FMT_UPG                         Hard config upgrade, from 2.1~alpha to current
@@ -1375,12 +1377,12 @@ Perform the update and continue? [Y/n] y
 Format upgrade done.
 
 <><> Rerunning init and update ><><><><><><><><><><><><><><><><><><><><><><><><>
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 RSTATE                          loaded opam files from repo default in 0.000s
-
-<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 [default] no changes from file://${BASEDIR}/default
 Update done, please now retry your command.
 # Return code 10 #
@@ -1435,12 +1437,12 @@ Perform the update and continue? [Y/n] y
 Format upgrade done.
 
 <><> Rerunning init and update ><><><><><><><><><><><><><><><><><><><><><><><><>
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 RSTATE                          loaded opam files from repo default in 0.000s
-
-<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 [default] no changes from file://${BASEDIR}/default
 Update done, please now retry your command.
 # Return code 10 #
@@ -1528,12 +1530,12 @@ Perform the update and continue? [Y/n] y
 Format upgrade done.
 
 <><> Rerunning init and update ><><><><><><><><><><><><><><><><><><><><><><><><>
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 RSTATE                          loaded opam files from repo default in 0.000s
-
-<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 [default] no changes from file://${BASEDIR}/default
 Update done, please now retry your command.
 # Return code 10 #
@@ -1605,12 +1607,12 @@ Perform the update and continue? [Y/n] y
 Format upgrade done.
 
 <><> Rerunning init and update ><><><><><><><><><><><><><><><><><><><><><><><><>
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 RSTATE                          loaded opam files from repo default in 0.000s
-
-<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 [default] no changes from file://${BASEDIR}/default
 Update done, please now retry your command.
 # Return code 10 #
@@ -1748,12 +1750,12 @@ Perform the update and continue? [Y/n] y
 Format upgrade done.
 
 <><> Rerunning init and update ><><><><><><><><><><><><><><><><><><><><><><><><>
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 RSTATE                          loaded opam files from repo default in 0.000s
-
-<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 [default] no changes from file://${BASEDIR}/default
 Update done.
 ### opam switch --short
@@ -2080,6 +2082,8 @@ roots: ["i-am-package.2" "i-am-sys-compiler.2"]
 ### ocaml generate.ml 2.1~rc
 ### opam init --reinit --bypass-checks --no-setup | "${OPAMROOTVERSION}($|,)" -> "current" | grep -v Cygwin
 No configuration file found, using built-in defaults.
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 [WARNING] Removing global switch 'this-internal-error' as it no longer exists
 FMT_UPG                         Light config upgrade, from 2.1~rc to current
@@ -2093,8 +2097,6 @@ Format upgrade done.
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 RSTATE                          loaded opam files from repo default in 0.000s
-
-<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 [default] no changes from file://${BASEDIR}/default
 ### opam switch --short
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
@@ -2441,6 +2443,8 @@ roots: ["i-am-package.2" "i-am-sys-compiler.2"]
 ### ocaml generate.ml 2.1
 ### opam init --reinit --bypass-checks --no-setup | "${OPAMROOTVERSION}($|,)" -> "current" | grep -v Cygwin
 No configuration file found, using built-in defaults.
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 [WARNING] Removing global switch 'this-internal-error' as it no longer exists
 FMT_UPG                         Light config upgrade, from 2.1 to current
@@ -2454,8 +2458,6 @@ Format upgrade done.
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 RSTATE                          loaded opam files from repo default in 0.000s
-
-<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 [default] no changes from file://${BASEDIR}/default
 ### opam-cat $OPAMROOT/config | '"${OPAMROOTVERSION}"' -> "current" | grep -v sys-pkg-manager-cmd | grep -v global-variables | grep -v eval-variables:
 default-compiler: ["i-am-sys-compiler" "i-am-compiler"]
@@ -2806,6 +2808,8 @@ roots: ["i-am-package.2" "i-am-sys-compiler.2"]
 ### ocaml generate.ml 2.2~alpha
 ### opam init --reinit --bypass-checks --no-setup | grep -v Cygwin | "${OPAMROOTVERSION}($|,)" -> "current"
 No configuration file found, using built-in defaults.
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 [WARNING] Removing global switch 'this-internal-error' as it no longer exists
 FMT_UPG                         Light config upgrade, from 2.2~alpha to current
@@ -2819,8 +2823,6 @@ Format upgrade done.
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 RSTATE                          loaded opam files from repo default in 0.000s
-
-<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 [default] no changes from file://${BASEDIR}/default
 ### opam-cat $OPAMROOT/config | '"${OPAMROOTVERSION}"' -> "current" | grep -v sys-pkg-manager-cmd | grep -v global-variables
 default-compiler: ["i-am-sys-compiler" "i-am-compiler"]
@@ -3164,6 +3166,8 @@ roots: ["i-am-package.2" "i-am-sys-compiler.2"]
 ### ocaml generate.ml 2.2~beta
 ### opam init --reinit --bypass-checks --no-setup | grep -v Cygwin
 No configuration file found, using built-in defaults.
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 [WARNING] Removing global switch 'this-internal-error' as it no longer exists
 FMT_UPG                         Light config upgrade, from 2.2~beta to 2.2
@@ -3175,8 +3179,6 @@ Format upgrade done.
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 RSTATE                          loaded opam files from repo default in 0.000s
-
-<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 [default] no changes from file://${BASEDIR}/default
 ### opam-cat $OPAMROOT/config | '"${OPAMROOTVERSION}"' -> "current" | grep -v sys-pkg-manager-cmd | grep -v global-variables
 default-compiler: ["i-am-sys-compiler" "i-am-compiler"]
@@ -3472,12 +3474,12 @@ roots: ["i-am-package.2" "i-am-sys-compiler.2"]
 ### ocaml generate.ml 2.2
 ### opam init --reinit --bypass-checks --no-setup | grep -v Cygwin
 No configuration file found, using built-in defaults.
+
+<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 GSTATE                          LOAD-GLOBAL-STATE @ ${BASEDIR}/OPAM
 RSTATE                          LOAD-REPOSITORY-STATE @ ${BASEDIR}/OPAM
 RSTATE                          No cache found
 RSTATE                          loaded opam files from repo default in 0.000s
-
-<><> Updating repositories ><><><><><><><><><><><><><><><><><><><><><><><><><><>
 [default] no changes from file://${BASEDIR}/default
 ### opam-cat $OPAMROOT/config | '"${OPAMROOTVERSION}"' -> "current" | grep -v sys-pkg-manager-cmd | grep -v global-variables
 default-compiler: ["i-am-sys-compiler" "i-am-compiler"]
