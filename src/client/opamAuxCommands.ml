@@ -545,17 +545,9 @@ let autopin st ?(simulate=false) ?quiet ?locked ?recurse ?subpath
     else
       OpamUpdate.dev_packages st ~working_dir:OpamPackage.Set.empty already_pinned
   in
-  (* Check if pinned packages contain depexts and add them to st *)
-  let more_pkgs =
-    OpamPackage.Set.filter (fun nv ->
-        (* dirty heuristic: recompute for all non-canonical packages *)
-        OpamPackage.Map.find_opt nv st.repos_package_index
-        <> OpamSwitchState.opam_opt st nv)
-      pins
-  in
   let depexts_s = OpamPackage.Set.fold 
       (fun p acc -> OpamSysPkg.Set.Op.(OpamSwitchState.depexts st p ++ acc)) 
-      more_pkgs OpamSysPkg.Set.empty 
+      pins OpamSysPkg.Set.empty 
   in
   let st =
     if OpamSysPkg.Set.is_empty depexts_s then
@@ -571,7 +563,7 @@ let autopin st ?(simulate=false) ?quiet ?locked ?recurse ?subpath
           OpamPackage.Map.union (fun _ n -> n)
             (Lazy.force st.sys_packages)
             (OpamSwitchState.depexts_status_of_packages ~recompute_available:true
-               st more_pkgs)
+               st pins)
         ) in
         {st with sys_packages}
       else 
