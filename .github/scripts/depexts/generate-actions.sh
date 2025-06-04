@@ -284,6 +284,57 @@ cat >> "$dir/entrypoint.sh" << EOF
 ./opam update --depexts || ERRORS="\$ERRORS opam-update-depexts"
 EOF
 
+
+
+cat >> "$dir/entrypoint.sh" << EOF
+cd /github/workspace
+mkdir -p testdir
+cp /github/workspace/.github/actions/$target/testpkgs/*.opam testdir/
+cd testdir
+
+ERRORS=""
+
+test_depext_behavior () {
+  local pkgfile=\$1
+  local pkgname=\$(basename "\$pkgfile" .opam)
+
+  opam switch create "\$pkgname-switch" --empty || true
+  opam install ./\$pkgfile || ERRORS="\$ERRORS \$pkgname"
+  opam remove \$pkgname || true
+}
+
+for f in *.opam; do
+  test_depext_behavior "\$f"
+done
+
+if [ -z "\$ERRORS" ]; then
+  echo "All depext tests passed."
+else
+  echo "Failed depext tests:\$ERRORS"
+  exit 1
+fi
+EOF
+
 chmod +x "$dir/entrypoint.sh"
 
 #done
+
+
+mkdir -p "$dir/testpkgs"
+
+generate_test_opam () {
+  local name=$1
+  local depexts=$2
+  cat > "$dir/testpkgs/${name}.opam" << EOF
+opam-version: "2.0"
+name: "$name"
+version: "1.0"
+depexts: [ $depexts ]
+EOF
+}
+
+generate_test_opam "test-depext-installed" "\"python\""
+
+generate_test_opam "test-depext-avail" "\"curl\""
+
+generate_test_opam "test-depext-unav" "\"no-such-pkg-for-real\""

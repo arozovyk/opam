@@ -9,8 +9,8 @@ on:
       - '.github/scripts/depexts/**'
   push:
     branches:
-      - 'master'
-      - '2.**'
+      - '*'
+ 
 
 defaults:
   run:
