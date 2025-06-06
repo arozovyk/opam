@@ -2592,6 +2592,7 @@ module PIN = struct
         (OpamPackage.Name.to_string name)
 
   let pin st name ?(edit=false) ?version ?(action=true) ?subpath ?locked target =
+  OpamConsole.error "PIN.pin";
     try
       let pinned = st.pinned in
       let st =
@@ -2631,6 +2632,7 @@ module PIN = struct
     | OpamPinCommand.Nothing_to_do -> st
 
   let url_pins st ?edit ?(action=true) ?locked ?(pre=fun _ -> ()) pins =
+  OpamConsole.error "PIN.url_pins";
     let names = List.map (fun p -> p.pinned_name) pins in
     (match names with
      | _::_::_ ->
@@ -2663,6 +2665,7 @@ module PIN = struct
     else st
 
   let edit st ?(action=true) ?version ?locked name =
+  OpamConsole.error "PIN.edit";
     let pinned = st.pinned in
     let st =
       if OpamPackage.has_name st.pinned name then
