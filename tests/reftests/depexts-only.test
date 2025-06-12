@@ -1,0 +1,75 @@
+N0REP0
+### :::Autopin from install, with depext involved:::
+### <pkg:foo-core.0.1>
+opam-version: "2.0"
+### <pkg:foo-format.0.1>
+opam-version: "2.0"
+### <pkg:ocaml.5>
+opam-version: "2.0"
+flags: compiler
+### <pkg:base.1>
+opam-version: "2.0"
+### <pkg:buildy.1>
+opam-version: "2.0"
+### <pkg:devvy.1>
+opam-version: "2.0"
+### <pkg:other.1>
+opam-version: "2.0"
+### <pkg:foo-file-format.3>
+opam-version: "2.0"
+### <pkg:foo-file-format.2>
+opam-version: "2.0"
+### <pkg:with-depexts.1>
+opam-version: "2.0"
+depexts: ["some-depext0"]
+### <pin:foo/foo-core.opam>
+version: "2.0"
+depends: [
+ "ocaml"
+ "base"
+ "buildy" {build}
+ "devvy" {dev}
+]
+conflicts: "conflicty"
+### <pin:foo/foo-format.opam>
+version: "2.0"
+depends: [
+  "ocaml"
+  "foo-core" {=version}
+  "foo-file-format"
+  "other"
+]
+depexts: ["some-depext"]
+### OPAMNODEPEXTS=0 OPAMCONFIRMLEVEL=unsafe-yes
+### opam-set-os dummy-success
+Added '[os-family "dummy-success" "Set through 'opam var'"]' to field global-variables in global configuration
+### opam switch create .
+[ERROR] autopin
+
+<><> Installing new switch packages <><><><><><><><><><><><><><><><><><><><><><>
+Switch invariant: ["ocaml" {>= "4.05.0"}]
+
+<><> Processing actions <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+-> installed ocaml.5
+Done.
+### opam install with-depexts --depext-only | sed-cmd echo
+[ERROR] autopin
+
+The following system packages will first need to be installed:
+    some-depext0
+
+<><> Handling external dependencies <><><><><><><><><><><><><><><><><><><><><><>
+
++ echo "some-depext0"
+- some-depext0
+### opam install ./foo --depext-only | sed-cmd echo
+[ERROR] autopin
+[ERROR] SwitchState.update_sys_packages
+
+The following system packages will first need to be installed:
+    some-depext
+
+<><> Handling external dependencies <><><><><><><><><><><><><><><><><><><><><><>
+
++ echo "some-depext"
+- some-depext

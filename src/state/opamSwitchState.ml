@@ -1341,6 +1341,7 @@ let update_sys_packages packages st =
     || (not (OpamSysPkg.Set.subset depexts_s available_depexts)) 
     then
       let sys_packages = lazy (
+        OpamConsole.error "SwitchState.update_sys_packages";
         OpamPackage.Map.union (fun x _ -> x)
           (Lazy.force st.sys_packages)
           (depexts_status_of_packages st packages)
