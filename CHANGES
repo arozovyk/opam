@@ -356,6 +356,7 @@ are not marked). Those prefixed with "(+)" are new command/option (since
     function, that create a file name in temporary directory and removes it
     at the end of the call [#6036 @rjbou]
 
+ 
 2.3.0:
 * (no difference compared to 2.3.0~rc1)
 
