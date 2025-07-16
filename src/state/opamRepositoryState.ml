@@ -111,6 +111,41 @@ let load_opams_from_dir repo_name repo_root =
     (fun () -> aux OpamPackage.Map.empty (OpamRepositoryPath.packages_dir repo_root))
     ~finally:OpamConsole.clear_status
 
+let load_opams_incremental repo_name repo_root changed_files rt =
+  let existing_opams =
+    try OpamRepositoryName.Map.find repo_name rt.repo_opams
+    with Not_found -> OpamPackage.Map.empty
+  in
+  List.fold_left (fun acc file ->
+      let packages_dir = OpamRepositoryPath.packages_dir repo_root in
+      let file_dir = OpamFilename.dirname file in
+      if OpamFilename.dir_starts_with packages_dir file_dir &&
+         OpamFilename.check_suffix file "opam" then
+        let package_dir = OpamFilename.dirname file in
+        (try
+           let nv =
+             OpamPackage.of_string
+               OpamFilename.(Base.to_string (basename_dir package_dir))
+           in
+           if OpamFilename.exists file then
+             match
+               OpamFileTools.read_repo_opam ~repo_name ~repo_root package_dir
+             with
+             | Some opam -> OpamPackage.Map.add nv opam acc
+             | None ->
+               log "ERR: Could read opam file %s, ignored" (OpamFilename.to_string file);
+               acc
+           else
+             OpamPackage.Map.remove nv acc
+         with Failure _ ->
+           log "ERR: directory name not a valid package: ignored %s"
+             (OpamFilename.to_string file);
+           acc)
+      else
+        (log "ERR: Could not load %s, ignored" (OpamFilename.to_string file);
+         acc)
+    ) existing_opams changed_files
+
 let load_repo repo repo_root =
   let t = OpamConsole.timer () in
   let repo_def =
