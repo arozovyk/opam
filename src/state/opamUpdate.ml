@@ -134,7 +134,17 @@ let repository rt repo =
         (Printexc.to_string e)
     | None ->
       let opams =
-        OpamRepositoryState.load_opams_from_dir repo.repo_name repo_root
+        let start_time = Unix.gettimeofday () in
+        let operation_type = "full" in
+        let result =
+          OpamRepositoryState.load_opams_from_dir repo.repo_name repo_root in
+        let end_time = Unix.gettimeofday () in
+        let duration = end_time -. start_time in
+        let tmp_file = "/tmp/opam_load_timing.txt" in
+        let oc = open_out tmp_file in
+        Printf.fprintf oc "%s,%.6f\n" operation_type duration;
+        close_out oc;
+        result
       in
       let local_dir = OpamRepositoryPath.root gt.root repo.repo_name in
       if OpamRepositoryConfig.(!r.repo_tarring) then
