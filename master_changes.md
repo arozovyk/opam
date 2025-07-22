@@ -119,6 +119,9 @@ users)
 ## opam-client
 
 ## opam-repository
+  * `OpamRepositoryBackend.update`: change type `Update_patch (filename * Patch.t list)` to include the list of file-level changes [#6614 @arozovyk - fix #5824]
+  * `OpamRepositoryBackend.get_diff`: change the return type to `(filename * Patch.t list) option` to include the list of file-level changes [#6614 @arozovyk - fix #5824]
+  * `OpamRepository.update`: change the return type to include the list of file-level changes [#6614 @arozovyk - fix #5824]
 
 ## opam-state
 
