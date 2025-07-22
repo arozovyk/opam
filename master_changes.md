@@ -45,6 +45,7 @@ users)
 ## Var/Option
 
 ## Update / Upgrade
+  * Use `OpamRepositoryState.load_opams_incremental` to efficiently update the `repo_opams`, adding/updating/removing only changed packages. [#6614 @arozovyk - fix #5824]
 
 ## Tree
 
@@ -124,6 +125,7 @@ users)
   * `OpamRepository.update`: change the return type to include the list of changed files [#6614 @arozovyk - fix #5824]
 
 ## opam-state
+  * Add `OpamRepositoryState.load_opams_incremental`: that incrementally reads opam files by using the list of changed files. [#6614 @arozovyk - fix #5824]
 
 ## opam-solver
 
