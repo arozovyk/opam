@@ -15,7 +15,7 @@ let slog = OpamConsole.slog
 
 type update =
   | Update_full of dirname
-  | Update_patch of (filename * filename list)
+  | Update_patch of (filename * Patch.t list)
   | Update_empty
   | Update_err of exn
 
@@ -171,21 +171,9 @@ let get_diff parent_dir dir1 dir2 =
     log "Internal diff (empty) done in %.2fs." (chrono ());
     None
   | diffs ->
-    let changed_files =
-      let rex = Re.compile (Re.str ".new") in
-      List.map (fun diff ->
-          let file  = match diff.Patch.operation with
-            | Patch.Edit (file1, _) -> file1
-            | Patch.Delete file -> file
-            | Patch.Create file -> file
-            | Patch.Git_ext (file1, _, _) -> file1
-          in
-          OpamFilename.Op.(parent_dir // (Re.replace_string rex ~by:"" file)))
-        diffs
-    in
     log "Internal diff (non-empty, changed files %d) done in %.2fs."
-      (List.length changed_files) (chrono ());
+      (List.length diffs) (chrono ());
     let patch = OpamSystem.temp_file ~auto_clean:false "patch" in
     let patch_file = OpamFilename.of_string patch in
     OpamFilename.write patch_file (Format.asprintf "%a" Patch.pp_list diffs);
-    Some (patch_file, changed_files)
+    Some (patch_file, diffs)

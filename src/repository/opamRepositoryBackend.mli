@@ -18,7 +18,7 @@ type update =
   | Update_full of dirname
   (** No previous known state, the full contents have been put in the given
       temporary directory *)
-  | Update_patch of (filename * filename list)
+  | Update_patch of (filename * Patch.t list)
   (** A patch file and the list of files it changes.
 
       Applying the patch (with 'patch -p1') to the local repository brings it to
@@ -120,4 +120,4 @@ val job_text:
     Unsupported file types: symlinks, character devices, block devices,
     named pipes, sockets.
     Unsupported comparison: comparison between regular files and directories. *)
-val get_diff: dirname -> basename -> basename -> (filename * filename list) option
+val get_diff: dirname -> basename -> basename -> (filename * Patch.t list) option

@@ -27,7 +27,7 @@ val packages_with_prefixes: dirname -> string option package_map
     absolute paths to all modified files.
 
     @raise Failure in case the update couldn't be achieved. *)
-val update: repository -> dirname -> [`Changes of filename list | `No_changes]
+val update: repository -> dirname -> [`Changes of Patch.t list | `No_changes]
     OpamProcess.job
 
 (** [pull_shared_tree ?cache_dir ?cache_url labels_dirnames checksums urls]

@@ -59,7 +59,7 @@ val load_opams_from_dir: repository_name -> dirname -> OpamFile.OPAM.t OpamPacka
       - Removes packages whose opam files were deleted
 
       @param changed_files List of absolute file paths that changed *)
-val load_opams_incremental: repository_name -> dirname -> filename list ->
+val load_opams_incremental: repository_name -> dirname -> Patch.t list ->
   'a repos_state -> OpamFile.OPAM.t package_map
 
 (** Load all the metadata within the local mirror of the given repository,
