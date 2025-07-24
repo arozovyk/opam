@@ -189,21 +189,38 @@ let load_opams_incremental repo_name repo_root diffs rt =
   let remove_file file acc = process_file acc file ~is_removal:true in
   let add_file file acc = process_file acc file ~is_removal:false in
   let process_operation acc = function
-    | Patch.Edit (old_file, new_file) ->
-      if OpamFilename.Dir.equal
-          (OpamFilename.Dir.of_string old_file)
-          (OpamFilename.Dir.of_string new_file)
-      then
-        add_file new_file acc
-      else
-        remove_file old_file acc |> add_file new_file
-    | Patch.Delete file -> remove_file file acc
-    | Patch.Create file -> add_file file acc
-    | Patch.Git_ext (file1, file2, git_ext) ->
-      match git_ext with
-      | Patch.Rename_only (_, _) -> remove_file file1 acc |> add_file file2
-      | Patch.Delete_only -> remove_file file1 acc
-      | Patch.Create_only -> add_file file2 acc
+  | Patch.Edit (old_file, new_file) ->
+     OpamConsole.msg " %s -> %s\n" old_file new_file;
+    if OpamFilename.Dir.equal
+        (OpamFilename.Dir.of_string old_file)
+        (OpamFilename.Dir.of_string new_file)
+    then (
+       OpamConsole.msg "Same directory, adding %s\n" new_file;
+      add_file new_file acc
+    ) else (
+       OpamConsole.msg "Different directory, removing %s and adding %s\n" old_file new_file;
+      remove_file old_file acc |> add_file new_file
+    )
+
+  | Patch.Delete file ->
+     OpamConsole.msg "Patch.Delete %s\n" file;
+    remove_file file acc
+
+  | Patch.Create file ->
+     OpamConsole.msg "Patch.Create %s\n" file;
+    add_file file acc
+
+  | Patch.Git_ext (file1, file2, git_ext) ->
+    (match git_ext with
+     | Patch.Rename_only (_, _) ->
+        OpamConsole.msg "Git Rename_only %s -> %s\n" file1 file2;
+       remove_file file1 acc |> add_file file2
+     | Patch.Delete_only ->
+        OpamConsole.msg "Git Delete_only %s\n" file1;
+       remove_file file1 acc
+     | Patch.Create_only ->
+        OpamConsole.msg "Git Create_only %s\n" file2;
+       add_file file2 acc)
   in
   List.fold_left (fun acc diff ->
       match filter_and_strip diff with

@@ -82,7 +82,7 @@ module VCS = struct
     else if OpamSystem.file_is_empty patch_file then
       (finalise (); Done None)
     else
-      Done (Some (OpamFilename.of_string patch_file))
+      Done (Some (OpamFilename.of_string patch_file, []))
 
   let is_up_to_date ?subpath:_ repo_root repo_url =
     let mark = mark_from_url repo_url in

@@ -206,7 +206,30 @@ module VCS : OpamVCS.VCS = struct
     else if OpamSystem.file_is_empty patch_file then
       (finalise (); Done None)
     else
-      Done (Some (OpamFilename.of_string patch_file))
+      let patch_content = OpamSystem.read patch_file in
+      OpamConsole.msg "Git patch content: %s\n" patch_content;
+      let diffs = Patch.parse ~p:1 patch_content in
+      let repo_name =
+        OpamFilename.Base.to_string (OpamFilename.basename_dir repo_root)
+      in
+      let append_repo_prefix path = repo_name ^ "/" ^ path in
+      let append_repo patch =
+        let fix_operation = function
+          | Patch.Edit (old_file, new_file) ->
+            Patch.Edit
+              (append_repo_prefix old_file, append_repo_prefix new_file)
+          | Patch.Delete file ->
+            Patch.Delete (append_repo_prefix file)
+          | Patch.Create file ->
+            Patch.Create (append_repo_prefix file)
+          | Patch.Git_ext (file1, file2, git_ext) ->
+            Patch.Git_ext
+              (append_repo_prefix file1, append_repo_prefix file2, git_ext)
+        in
+        { patch with Patch.operation = fix_operation patch.Patch.operation }
+      in
+      let diffs = List.map append_repo diffs in
+      Done (Some (OpamFilename.of_string patch_file, diffs))
 
   let is_up_to_date ?subpath repo_root repo_url =
     let rref = remote_ref repo_url in

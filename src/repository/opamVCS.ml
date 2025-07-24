@@ -22,7 +22,7 @@ module type VCS = sig
     unit OpamProcess.job
   val reset_tree: dirname -> url -> unit OpamProcess.job
   val patch_applied: dirname -> url -> unit OpamProcess.job
-  val diff: dirname -> url -> filename option OpamProcess.job
+  val diff: dirname -> url -> (filename * Patch.t list) option OpamProcess.job
   val is_up_to_date: ?subpath:subpath -> dirname -> url -> bool OpamProcess.job
   val revision: dirname -> string option OpamProcess.job
   val versioned_files: dirname -> string list OpamProcess.job
@@ -53,7 +53,7 @@ module Make (VCS: VCS) = struct
         (VCS.diff repo_root repo_url)
       @@| function
       | None -> OpamRepositoryBackend.Update_empty
-      | Some patch -> OpamRepositoryBackend.Update_patch (patch, [])
+      | Some (patch, diffs) -> OpamRepositoryBackend.Update_patch (patch, diffs)
     else
       OpamProcess.Job.catch (fun e ->
           OpamFilename.rmdir repo_root;

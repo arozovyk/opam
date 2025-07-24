@@ -50,7 +50,7 @@ module type VCS = sig
 
   (** Returns the pending modifications in the form of a patch file, or None if
       [dirname] is up to date with what was last fetched. *)
-  val diff: dirname -> url -> filename option OpamProcess.job
+  val diff: dirname -> url -> (filename * Patch.t list) option OpamProcess.job
 
   (** Returns true if the last fetched state is equal to the current, on-disk
       state *)

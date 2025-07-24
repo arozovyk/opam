@@ -13,6 +13,11 @@ synopsis: "Third package"
 ### opam switch create repo-update --empty
 ### opam repository add default ./REPO --this-switch
 [default] synchronised from file://${BASEDIR}/REPO
+Patch.Create packages/bar/bar.1/opam
+Patch.Create packages/baz/baz.1/opam
+Patch.Create packages/foo/foo.1/opam
+ repo -> repo
+Same directory, adding repo
 ### opam list --all --all-versions -s
 bar.1
 baz.1
@@ -25,6 +30,7 @@ synopsis: "New package created"
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default] synchronised from file://${BASEDIR}/REPO
+Patch.Create packages/newpkg/newpkg.1/opam
 Now run 'opam upgrade' to apply any package updates.
 ### opam list --all --all-versions -s
 bar.1
@@ -37,6 +43,7 @@ newpkg.1
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default] synchronised from file://${BASEDIR}/REPO
+Patch.Delete packages/bar/bar.1/opam
 Now run 'opam upgrade' to apply any package updates.
 ### opam list --all --all-versions -s
 baz.1
@@ -50,6 +57,8 @@ synopsis: "Updated package"
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default] synchronised from file://${BASEDIR}/REPO
+ packages/foo/foo.1/opam -> packages/foo/foo.1/opam
+Same directory, adding packages/foo/foo.1/opam
 ### opam show foo.1 --field synopsis
 Updated package
 ### : File move across directories (delete+create operations)
@@ -58,6 +67,8 @@ Updated package
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default] synchronised from file://${BASEDIR}/REPO
+Patch.Delete packages/foo/foo.1/opam
+Patch.Create packages/foo/newfoo.1/opam
 Now run 'opam upgrade' to apply any package updates.
 ### opam list --all --all-versions -s
 baz.1
@@ -69,6 +80,7 @@ newpkg.1
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default] synchronised from file://${BASEDIR}/REPO
+Patch.Delete packages/newpkg/newpkg.1/opam
 Now run 'opam upgrade' to apply any package updates.
 ### opam list --all --all-versions -s
 baz.1
@@ -85,6 +97,10 @@ description: "Updated in multi-operation"
 
 <><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
 [default] synchronised from file://${BASEDIR}/REPO
+ packages/foo/newfoo.1/opam -> packages/foo/newfoo.1/opam
+Same directory, adding packages/foo/newfoo.1/opam
+Patch.Create packages/multi1/multi1.1/opam
+Patch.Create packages/multi2/multi2.1/opam
 Now run 'opam upgrade' to apply any package updates.
 ### opam list --all --all-versions -s
 baz.1
@@ -122,3 +138,86 @@ opam-version: "2.0"
 name: "baz"
 version: "1"
 synopsis: "Third package"
+### git init -q --initial-branch=master GITREPO
+### git -C GITREPO config core.autocrlf false
+### <GITREPO/repo>
+opam-version: "2.0"
+### <GITREPO/packages/rename-pkg/rename-pkg.1/opam>
+opam-version: "2.0"
+synopsis: "Package to be renamed"
+### <GITREPO/packages/delete-pkg/delete-pkg.1/opam>
+opam-version: "2.0"
+synopsis: "Package to be deleted"
+### git -C GITREPO add -A
+### git -C GITREPO commit -qm "initial commit"
+### opam repository add git-test --kind=git git+file://${BASEDIR}/GITREPO --this-switch
+[git-test] Initialised
+### opam list --all --all-versions --repo=git-test -s
+delete-pkg.1
+rename-pkg.1
+### : Git rename of opam file (should trigger Git_ext Rename_only)
+### mkdir -p GITREPO/packages/rename-pkg/renamed-pkg.1
+### git -C GITREPO mv packages/rename-pkg/rename-pkg.1/opam packages/rename-pkg/renamed-pkg.1/opam
+### git -C GITREPO commit -qm "rename opam file"
+### opam update git-test
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+Git patch content: diff --git b/packages/rename-pkg/rename-pkg.1/opam a/packages/rename-pkg/renamed-pkg.1/opam
+similarity index 100%
+rename from packages/rename-pkg/rename-pkg.1/opam
+rename to packages/rename-pkg/renamed-pkg.1/opam
+
+[git-test] synchronised from git+file://${BASEDIR}/GITREPO
+Git Rename_only packages/rename-pkg/rename-pkg.1/opam -> packages/rename-pkg/renamed-pkg.1/opam
+Now run 'opam upgrade' to apply any package updates.
+### opam list --all --all-versions --repo=git-test -s
+delete-pkg.1
+renamed-pkg.1
+### : Git deletion of opam file (should trigger Git_ext Delete_only)
+### git -C GITREPO rm packages/delete-pkg/delete-pkg.1/opam
+rm 'packages/delete-pkg/delete-pkg.1/opam'
+### git -C GITREPO commit -qm "delete opam file"
+### opam update git-test
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+Git patch content: diff --git b/packages/delete-pkg/delete-pkg.1/opam a/packages/delete-pkg/delete-pkg.1/opam
+deleted file mode 100644
+index 5c90904..0000000
+--- b/packages/delete-pkg/delete-pkg.1/opam
++++ /dev/null
+@@ -1,2 +0,0 @@
+-opam-version: "2.0"
+-synopsis: "Package to be deleted"
+
+[git-test] synchronised from git+file://${BASEDIR}/GITREPO
+Patch.Delete packages/delete-pkg/delete-pkg.1/opam
+Now run 'opam upgrade' to apply any package updates.
+### opam list --all --all-versions --repo=git-test -s
+renamed-pkg.1
+### : Git creation of new opam file (should trigger Git_ext Create_only)
+### <GITREPO/packages/new-pkg/new-pkg.1/opam>
+opam-version: "2.0"
+synopsis: "New package created"
+### git -C GITREPO add packages/new-pkg/new-pkg.1/opam
+### git -C GITREPO commit -qm "create new opam file"
+### opam update git-test
+
+<><> Updating package repositories ><><><><><><><><><><><><><><><><><><><><><><>
+Git patch content: diff --git b/packages/new-pkg/new-pkg.1/opam a/packages/new-pkg/new-pkg.1/opam
+new file mode 100644
+index 0000000..af673ba
+--- /dev/null
++++ a/packages/new-pkg/new-pkg.1/opam
+@@ -0,0 +1,2 @@
++opam-version: "2.0"
++synopsis: "New package created"
+
+[git-test] synchronised from git+file://${BASEDIR}/GITREPO
+Patch.Create packages/new-pkg/new-pkg.1/opam
+Now run 'opam upgrade' to apply any package updates.
+### : Verify final state
+### opam list --all --all-versions --repo=git-test
+# Packages matching: from-repository(git-test) & any
+# Package     # Installed # Synopsis
+new-pkg.1     --          New package created
+renamed-pkg.1 --          Package to be renamed
