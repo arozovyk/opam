@@ -48,6 +48,7 @@ users)
 ## Var/Option
 
 ## Update / Upgrade
+  * Use `OpamRepositoryState.load_opams_incremental` to efficiently update the `repo_opams`, adding/updating/removing only changed packages. [#6614 @arozovyk - fix #5824]
 
 ## Tree
 
@@ -119,6 +120,7 @@ users)
   * Add a test for shared fetch without checksum, and for VCS shared fetch (not handled) [#6627 @rjbou]
   * Add a test showing the error message when faced with an UTF-8 character in the package version [#6640 @kit-ty-kate]
 
+  * Add tests for repository update using `OpamRepositoryState.load_opams_incremental` [#6614 @arozovyk - fix #5824]
 ### Engine
   * Fix gcc < 14.3 bug on mingw i686 [#6624 @kit-ty-kate]
   * Fix support for removing local link directories [#6450 @kit-ty-kate]
@@ -160,6 +162,7 @@ users)
 
 ## opam-state
   * `OpamSwitchState.files`: was removed [#6662 @kit-ty-kate]
+  * Add `OpamRepositoryState.load_opams_incremental`: that only updates opam files that actually changed, using a list of `Patch.operation`; use it in `OpamUpdate.repository` [#6614 @arozovyk - fix #5824]
 
 ## opam-solver
 
