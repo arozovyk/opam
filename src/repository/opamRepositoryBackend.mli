@@ -18,12 +18,11 @@ type update =
   | Update_full of dirname
   (** No previous known state, the full contents have been put in the given
       temporary directory *)
-  | Update_patch of (filename * Patch.t list)
-  (** A patch file and the list of file-level changes it contains.
+  | Update_patch of filename
+  (** A patch file.
 
       Applying the patch (with 'patch -p1') to the local repository brings it to
-      the upstream state. The second element is a list of [Patch.t] entries
-      representing creations, deletions, and modifications of regular files. *)
+      the upstream state. *)
   | Update_empty
   (** The repository is already up to date *)
   | Update_err of exn
@@ -112,12 +111,11 @@ val job_text:
 
 (** [get_diff parent_dir subdir1 subdir2] computes the diff between the two
     subdirs of [parent_dir], returns None if they are equal, and a patch file
-    with a list of file-level changes [Patch.t] representing creations,
-    deletions, and modifications of regular files.
+    otherwise.
 
     @raise Stdlib.Failure if an unsupported file type or comparison is
     detected in any of [subdir1] or [subdir2].
     Unsupported file types: symlinks, character devices, block devices,
     named pipes, sockets.
     Unsupported comparison: comparison between regular files and directories. *)
-val get_diff: dirname -> basename -> basename -> (filename * Patch.t list) option
+val get_diff: dirname -> basename -> basename -> filename option

@@ -111,50 +111,15 @@ let load_opams_from_dir repo_name repo_root =
     (fun () -> aux OpamPackage.Map.empty (OpamRepositoryPath.packages_dir repo_root))
     ~finally:OpamConsole.clear_status
 
-let load_opams_incremental repo_name repo_root diffs rt =
+let load_opams_incremental repo_name repo_root (diffs : Patch.t list ) rt =
   let existing_opams =
     match OpamRepositoryName.Map.find_opt repo_name rt.repo_opams with
     | Some opams -> opams
     | None -> OpamPackage.Map.empty
   in
   let packages_dir = OpamRepositoryPath.packages_dir repo_root in
-  let strip_repo_prefix file =
-    match OpamStd.String.cut_at file '/' with
-    | Some (repo_part, path_rest) ->
-      let repo_part =
-        if String.ends_with ~suffix:".new" repo_part then
-          String.sub repo_part 0 (String.length repo_part - 4)
-        else
-          repo_part
-      in
-      if
-        String.equal (OpamRepositoryName.to_string repo_name) repo_part
-      then
-        Some path_rest
-      else
-        (log "ERR: Invalid repo prefix in file path: %s, ignored" file;
-         None)
-    | None ->
-      log "ERR: Malformed file path (no '/'): %s, ignored." file;
-      None
-  in
-  let filter_and_strip p =
-    match p.Patch.operation with
-    | Patch.Edit (old_file, new_file) ->
-      Option.bind (strip_repo_prefix old_file)
-        (fun o -> Option.bind (strip_repo_prefix new_file)
-            (fun n -> Some (Patch.Edit (o, n))))
-    | Patch.Delete file ->
-      Option.map (fun f -> Patch.Delete f) (strip_repo_prefix file)
-    | Patch.Create file ->
-      Option.map (fun f -> Patch.Create f) (strip_repo_prefix file)
-    | Patch.Git_ext (file1, file2, git_ext) ->
-      Option.bind (strip_repo_prefix file1)
-        (fun f1 -> Option.bind (strip_repo_prefix file2)
-            (fun f2 -> Some (Patch.Git_ext (f1, f2, git_ext))))
-  in
   let process_file acc file ~is_removal =
-    if not (String.ends_with file ~suffix:"opam") then
+    if not (String.ends_with file ~suffix:"/opam") then
       (log "Skipping non-opam file: %s" file;
        acc)
     else
@@ -205,10 +170,7 @@ let load_opams_incremental repo_name repo_root diffs rt =
       | Patch.Delete_only -> remove_file file1 acc
       | Patch.Create_only -> add_file file2 acc
   in
-  List.fold_left (fun acc diff ->
-      match filter_and_strip diff with
-      | Some op -> process_operation acc op
-      | None -> acc)
+  List.fold_left (fun acc p -> process_operation acc Patch.(p.operation))
     existing_opams diffs
 
 let load_repo repo repo_root =

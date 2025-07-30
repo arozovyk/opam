@@ -490,7 +490,7 @@ let validate_repo_update repo repo_root update =
         | "anchors", _ -> Some (S (String.concat "," ta.fingerprints))
         | "quorum", _ -> Some (S (string_of_int ta.quorum))
         | "repo", _ -> Some (S (OpamFilename.Dir.to_string repo_root))
-        | "patch", Update_patch (f, _) -> Some (S (OpamFilename.to_string f))
+        | "patch", Update_patch f -> Some (S (OpamFilename.to_string f))
         | "incremental", Update_patch _ -> Some (B true)
         | "incremental", _ -> Some (B false)
         | "dir", Update_full d -> Some (S (OpamFilename.Dir.to_string d))
@@ -525,7 +525,7 @@ let apply_repo_update repo repo_root = function
       (OpamConsole.colorise `green
          (OpamRepositoryName.to_string repo.repo_name));
     Done []
-  | Update_patch (f, diffs) ->
+  | Update_patch f ->
     OpamConsole.msg "[%s] synchronised from %s\n"
       (OpamConsole.colorise `green
          (OpamRepositoryName.to_string repo.repo_name))
@@ -538,9 +538,13 @@ let apply_repo_update repo repo_root = function
       | `http | `rsync -> false
       | _ -> true
     in
-    let err = OpamFilename.patch ~preprocess ~allow_unclean:false f repo_root in
+    let patch_result =
+      OpamFilename.patch ~preprocess ~allow_unclean:false f repo_root
+    in
     if not (OpamConsole.debug ()) then OpamFilename.remove f;
-    OpamStd.Option.map_default raise (Done diffs) err
+    (match patch_result with
+     | `Patched diffs -> Done diffs
+     | `Exception exn -> raise exn)
   | Update_empty ->
     OpamConsole.msg "[%s] no changes from %s\n"
       (OpamConsole.colorise `green
@@ -555,7 +559,7 @@ let cleanup_repo_update upd =
   if not (OpamConsole.debug ()) then
     match upd with
     | Update_full d -> OpamFilename.rmdir d
-    | Update_patch (f, _) -> OpamFilename.remove f
+    | Update_patch f -> OpamFilename.remove f
     | _ -> ()
 
 let update repo repo_root =
