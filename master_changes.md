@@ -156,6 +156,7 @@ users)
 
 ## opam-repository
   * `OpamLocal.rsync_*`: Change the return type from `OpamFilename.*` to `unit` [#6658 @kit-ty-kate]
+  * `OpamRepository.update` include the list of file-level changes in the return type `['Changes of Patch.operation list]` [#6614 @arozovyk - fix #5824]
 
 ## opam-state
   * `OpamSwitchState.files`: was removed [#6662 @kit-ty-kate]
@@ -184,3 +185,4 @@ users)
   * `OpamStd.String.contains_char`: was removed. Use `Stdlib.String.contains` instead. [#6442 @kit-ty-kate]
   * `OpamStd.String.map`: was removed. Use `Stdlib.String.map` instead. [#6442 @kit-ty-kate]
   * `OpamStd.String.{starts_with,ends_with,for_all,fold_left}`: were moved to `OpamCompat.String` [#6442 @kit-ty-kate]
+  * `OpamSystem.patch`, `OpamFilename.patch`: change return type from `exn option` to `['Patched of Patch.operation list | 'Exception of exn]` to include the list of applied patch operations [#6614 @arozovyk - fix #5824]
