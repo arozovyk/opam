@@ -117,39 +117,24 @@ let load_opams_incremental repo_name repo_root (diffs : Patch.t list ) rt =
     | Some opams -> opams
     | None -> OpamPackage.Map.empty
   in
-  let packages_dir = OpamRepositoryPath.packages_dir repo_root in
   let process_file acc file ~is_removal =
-    if not (String.ends_with file ~suffix:"/opam") then
-      (log "Skipping non-opam file: %s" file;
-       acc)
-    else
-      let file_path = OpamFilename.Op.(repo_root // file) in
-      let package_dir = OpamFilename.dirname file_path in
-      if OpamFilename.dir_starts_with packages_dir package_dir then
-        match OpamPackage.of_string_opt
-                (OpamFilename.Base.to_string
-                   (OpamFilename.basename_dir package_dir)) with
-        | None ->
-          log "ERR: directory name not a valid package: ignored %s"
-            (OpamFilename.to_string file_path);
-          acc
-        | Some nv ->
-          if is_removal then
-            OpamPackage.Map.remove nv acc
-          else
-            match
-              OpamFileTools.read_repo_opam ~repo_name ~repo_root package_dir
-            with
-            | Some opam ->
-              OpamPackage.Map.add nv opam acc
-            | None ->
-              log "ERR: Could not read opam file %s, ignored"
-                (OpamFilename.to_string file_path);
-              acc
+    match OpamPackage.of_filename (OpamFilename.of_string file) with
+    | None ->
+      log "ERR: directory name not a valid package: ignored %s" file;
+      acc
+    | Some nv ->
+      if is_removal then
+        OpamPackage.Map.remove nv acc
       else
-        (log "File path not under packages_dir: %s, ignored."
-           (OpamFilename.to_string file_path);
-         acc)
+        let package_dir = OpamFilename.dirname (OpamFilename.Op.(repo_root // file)) in
+        match
+          OpamFileTools.read_repo_opam ~repo_name ~repo_root package_dir
+        with
+        | Some opam ->
+          OpamPackage.Map.add nv opam acc
+        | None ->
+          log "ERR: Could not read opam file %s, ignored" file;
+          acc
   in
   let remove_file file acc = process_file acc file ~is_removal:true in
   let add_file file acc = process_file acc file ~is_removal:false in
