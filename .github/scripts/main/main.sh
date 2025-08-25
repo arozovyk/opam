@@ -135,9 +135,7 @@ prepare_project () {
 
 if [ "$OPAM_TEST" = "1" ]; then
   # test if an upgrade is needed
-  set +e
-  opam list 2> /dev/null
-  rcode=$?
+  opam list 2> /dev/null || rcode=$?
   if [ $rcode -eq 10 ]; then
     echo "Recompiling for an opam root upgrade"
     (set +x ; echo -en "::group::rebuild opam\r") 2>/dev/null
@@ -145,16 +143,13 @@ if [ "$OPAM_TEST" = "1" ]; then
     make all admin
     rm -f "$PREFIX/bin/opam"
     make install
-    opam list 2> /dev/null
-    rcode=$?
-    set -e
+    opam list 2> /dev/null || rcode=$?
     if [ $rcode -ne 10 ]; then
       echo -e "\e[31mBad return code $rcode, should be 10\e[0m";
       exit $rcode
     fi
     (set +x ; echo -en "::endgroup::rebuild opam\r") 2>/dev/null
   fi
-  set -e
 
   # Note: these tests require a "system" compiler and will use the one in $OPAMBSROOT
   make tests
@@ -177,27 +172,23 @@ test_project () {
   project=$2
 
   (set +x; echo -en "::group::depends-$project\r") 2>/dev/null
-  set +e
   opam pin "$url" --kind git -yn
   for pkg_name in $(opam show . -f name); do
     echo "Installing dependencies for $pkg_name"
-    opam install "$pkg_name" --deps-only
-    deps_code=$?
+    opam install "$pkg_name" --deps-only || deps_code=$?
     if [ $deps_code -ne 0 ]; then
       echo "Dependency installation failed for $pkg_name"
       DEPENDS_ERRORS="$DEPENDS_ERRORS $pkg_name"
     else
       echo "Installing opam-client and $pkg_name"
       opam install opam-client
-      opam install "$pkg_name"
-      code=$?
+      opam install "$pkg_name" || code=$?
       if [ $code -ne 0 ]; then
         LIB_ERRORS="$LIB_ERRORS $project"
         echo -e "\e[31mErrors while installing $pkg_name\e[0m";
       fi
     fi
   done
-  set -e
   (set +x ; echo -en "::endgroup::depends-$project\r") 2>/dev/null
 }
 
@@ -212,6 +203,7 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
   depends_on=$(echo "$opam_libs" | sed "s/\$/.${VERSION}/" | paste -sd, -)
   packages=$(opam list --or --depends-on "$depends_on" --columns name | tail -n +3)
   set +x
+  packages="odoc-driver"
   for exclude in $opam_libs; do
     packages=$(echo "$packages" | grep -v -x "$exclude")
   done
