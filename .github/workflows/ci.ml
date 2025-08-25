@@ -33,7 +33,7 @@ let workflow ~oc ~env name f =
 {|name: %s
 
 on:
-  pull_request:
+  pull_request_target:
     paths:
       - 'src/**'
       - '!src/tools/**'
@@ -50,8 +50,7 @@ on:
       - 'shell/'
   push:
     branches:
-      - 'master'
-      - '2.**'
+      - '*'
 |} name;
   if env <> [] then begin
     output_char oc '\n';
@@ -59,6 +58,11 @@ on:
   end;
   output_string oc
 {|
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
 defaults:
   run:
     shell: bash
@@ -470,6 +474,99 @@ let upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_jo
     ++ run "Test (upgrade)" ["bash -exu .github/scripts/main/upgrade.sh"]
     ++ end_job f
 
+let depends_job ~analyse_job ~build_linux_job ?section runner ~oc ~workflow f =
+  let platform = os_of_platform runner in
+  let host = host_of_platform platform in
+  let only_on target = only_on platform target in
+  let needs = [analyse_job; build_linux_job ] in
+  let env = [("OPAM_DEPENDS", "1")] in
+  let matrix = platform_ocaml_matrix ~fail_fast:false start_latests_ocaml in
+  let ocamlv = "${{ matrix.ocamlv }}" in
+  let fail_if_dependent = ["opam-publish"; "opam-rt"; "opam-build"; "opam-test"] in
+  let summary_comment_script =
+    {|const version = process.env.OCAMLV;
+const vkey = version.replace(/\./g, "_");
+const errorRaw = process.env[`LIB_ERRORS_${vkey}`];
+const all = process.env[`ALL_PROJECTS_${vkey}`];
+const ocamlver = process.env.OCAMLVER;
+const commit = process.env.PR_REF_SHA;
+const marker = `<!-- ocaml-${vkey}-error -->`;
+const lines = [marker];
+if (all) { lines.push(`Tested projects: ${all}`); }
+lines.push(`OCaml version: ${ocamlver}. Commit: ${commit}.`);
+if (errorRaw) {
+  lines.push(`${errorRaw}`);
+}
+const body = lines.join("\n");
+if (lines.length < 2) return;
+const comments = await github.rest.issues.listComments({
+  owner: context.repo.owner,
+  repo: context.repo.repo,
+  issue_number: context.payload.pull_request.number
+});
+const existing = comments.data.find(c => c.body.startsWith(marker));
+if (existing) {
+  await github.rest.issues.updateComment({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    comment_id: existing.id,
+    body
+  });
+} else {
+  await github.rest.issues.createComment({
+    issue_number: context.payload.pull_request.number,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    body
+  });
+}|} |> String.split_on_char '\n'
+  in
+  let get_job_id_script =
+    {|const run_id = context.runId;
+const jobs = await github.rest.actions.listJobsForWorkflowRun({
+  owner: context.repo.owner,
+  repo: context.repo.repo,
+  run_id
+});
+const currentJobName = process.env.GITHUB_JOB;
+const matrixOCaml = process.env.OCAMLV;
+const thisJob = jobs.data.jobs.find(j =>
+  j.name.includes(currentJobName) && j.name.includes(matrixOCaml)
+);
+core.setOutput("job_url", thisJob.html_url);|} |> String.split_on_char '\n'
+  in
+  job ~oc ~workflow ?section ~runs_on:(Runner [platform]) ~env ~needs ~matrix 
+    ~permissions:[("pull-requests", "write");("issues", "write");("contents", "read")] ("Depends-" ^ name_of_platform platform)
+  ++ only_on Linux (run "Install bubblewrap" ["sudo apt install bubblewrap"])
+  ++ only_on Linux (run "Disable AppArmor" ["echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns"])
+  ++ checkout ()
+  ++ cache Archives
+  ++ cache OCaml platform ocamlv host
+  ++ build_cache OCaml platform ocamlv host
+  ++ cache OpamBS ocamlv "depends"
+  ++ build_cache OpamBS ocamlv "depends"
+  ++ uses "Get job ID"
+    ~id:"get-job-id"
+    ~env:[("OCAMLV", ocamlv)]
+    ~withs:[
+      ("script", Literal  get_job_id_script)
+    ]
+    "actions/github-script@v7"
+  ++ run "Compile" ~env:[("BASE_REF_SHA", "${{ github.event.pull_request.base.sha }}");
+                         ("PR_REF_SHA", "${{ github.event.pull_request.head.sha }}");
+                         ("GITHUB_PR_USER", "${{ github.event.pull_request.user.login }}");
+                         ("JOB_URL", "${{ steps.get-job-id.outputs.job_url }}");
+                         ("FAIL_IF_DEPENDENT", String.concat " " fail_if_dependent)]
+    ["bash -exu .github/scripts/main/main.sh " ^ host]
+  ++ uses "Comment or update PR with reverse dependency testing results"
+    ~cond:(Predicate(true, Compare("github.event_name", "pull_request")))
+    ~env:[("OCAMLV", ocamlv)]
+    ~withs:[
+      ("script", Literal summary_comment_script)
+    ]
+    "actions/github-script@v7"
+  ++ end_job f
+
 let hygiene_job (type a) ~analyse_job (platform : a platform) ~oc ~workflow f =
   job ~oc ~workflow ~section:"Around opam tests" ~runs_on:(Runner [platform]) ~needs:[analyse_job] "Hygiene"
     ++ install_sys_dune [os_of_platform platform]
@@ -517,8 +614,8 @@ let main oc : unit =
     ("OPAM12CACHE", "~/.cache/opam1.2/cache");
     (* These should be identical to the values in appveyor.yml *)
     ("OPAM_REPO", "https://github.com/ocaml/opam-repository.git");
-    ("OPAM_TEST_REPO_SHA", "e9ce8525130a382fac004612302b2f2268f4188c");
-    ("OPAM_REPO_SHA", "e9ce8525130a382fac004612302b2f2268f4188c");
+    ("OPAM_TEST_REPO_SHA", "ee245280716d67a725ee0e077c693787eb6733e1");
+    ("OPAM_REPO_SHA", "ee245280716d67a725ee0e077c693787eb6733e1");
     ("SOLVER", "");
     (* Cygwin configuration *)
     ("CYGWIN_MIRROR", "http://mirrors.kernel.org/sourceware/cygwin/");
@@ -535,19 +632,9 @@ let main oc : unit =
   workflow ~oc ~env "Builds, tests & co"
   ++ analyse_job ~keys ~platforms:[Linux]
   @@ fun analyse_job -> cygwin_job ~analyse_job
-  @@ fun cygwin_job -> main_build_job ~analyse_job ~cygwin_job ~section:"Build" Linux (4, 08)
-  @@ fun build_linux_job -> main_build_job ~analyse_job ~cygwin_job Windows start_latests_ocaml
-  @@ fun build_windows_job -> main_build_job ~analyse_job ~cygwin_job MacOS start_latests_ocaml
-  @@ fun build_macOS_job -> main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam tests" Linux
-  @@ fun _ -> main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
-  @@ fun _ -> cold_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam cold" Linux
-  @@ fun _ -> doc_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Compile doc" Linux
-  @@ fun _ -> solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Compile solver backends" Linux
-  @@ fun _ -> solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
-  @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Upgrade from 1.2 to current" Linux
-  @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
   @@ fun _ -> hygiene_job ~analyse_job (Specific (Linux, "22.04"))
-  @@ fun _ -> end_workflow
+  @@ fun build_linux_job -> depends_job ~analyse_job ~build_linux_job Linux
+  @@ fun _ -> end_workflow 
 
 let () =
   let oc = open_out "main.yml" in
