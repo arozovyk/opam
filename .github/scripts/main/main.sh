@@ -246,12 +246,12 @@ if [ "$OPAM_DEPENDS" = "1" ]; then
     set +x
     for critical in $FAIL_IF_DEPENDENT; do
       if echo "$LIB_ERRORS" | grep -wq "$critical"; then
-        FAIL="$FAIL $critical"
+         FAIL+=("$critical")
       fi
     done
     set -x
     if [ -n "$FAIL" ]; then
-      echo "::error ::$critical is broken"
+      echo "::error ::$FAIL is broken"
       exit 1
     fi
   fi

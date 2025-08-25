@@ -50,8 +50,7 @@ on:
       - 'shell/'
   push:
     branches:
-      - 'master'
-      - '2.**'
+      - '*'
 |} name;
   if env <> [] then begin
     output_char oc '\n';
