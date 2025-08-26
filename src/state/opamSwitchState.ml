@@ -536,21 +536,17 @@ let load lock_kind gt rt switch =
   ) in
   (* depext check *)
   let available_packages = OpamCompat.Lazy.map fst available_packages in
+  OpamConsole.errmsg "load : OpamSysPkg.Set.is_empty pinned_depexts %b \n"
+    (OpamSysPkg.Set.is_empty pinned_depexts);
   let sys_packages =
     if not (OpamFile.Config.depext gt.config)
     || OpamStateConfig.(!r.no_depexts) then
       lazy OpamPackage.Map.empty
     else lazy (
+      OpamConsole.errmsg "depexts_status_of_packages_raw : OpamSysPkg.Set.is_empty pinned_depexts %b\n"
+        (OpamSysPkg.Set.is_empty pinned_depexts);
       depexts_status_of_packages_raw
-        ~recompute_available:(
-          (* Recompute only when pinned packages have depexts
-             not covered by cached repos_sys_available_pkgs *)
-          not (OpamSysPkg.Set.is_empty pinned_depexts) &&
-          match rt.repos_sys_available_pkgs with
-          | OpamSysPkg.Available available_pkgs ->
-            not (OpamSysPkg.Set.subset pinned_depexts available_pkgs)
-          | OpamSysPkg.Suppose_available -> false
-        ) rt.repos_sys_available_pkgs
+        rt.repos_sys_available_pkgs
         gt.config switch_config ~env:gt.global_variables
         (Lazy.force available_packages)
         ~depexts:(fun package ->
