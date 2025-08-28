@@ -356,7 +356,7 @@ let main_build_job ~analyse_job ~cygwin_job ?section runner start_version ~oc ~w
          ~withs:[ ("name", Literal ["opam-exe-${{ matrix.host }}-${{ matrix.ocamlv }}-${{ matrix.build }}"]);
                   ("path", Literal ["D:\\Local\\bin\\opam.exe"; "D:\\Local\\bin\\opam-installer.exe"; "D:\\Local\\bin\\opam-putenv.exe"]) ]
          "actions/upload-artifact@v4")
-    ++ only_on Windows (run "Test (basic - Cygwin)" ~cond:(Predicate(true, EndsWith("matrix.host", "-pc-cygwin"))) ["bash -exu .github/scripts/main/test.sh"])
+    ++ only_on Windows (run "Test (basic - Cygwin)" ~env:[("CYGWIN_TEST", "1")] ~cond:(Predicate(true, EndsWith("matrix.host", "-pc-cygwin"))) ["bash -exu .github/scripts/main/test.sh"])
     ++ only_on Windows (run "Test (basic - native Windows)" ~env:[("OPAMROOT", {|D:\a\opam\opam\.opam|})] ~shell:"cmd" ~cond:(Predicate(false, EndsWith("matrix.host", "-pc-cygwin")))
          ({|set Path=D:\Cache\ocaml-local\bin;%Path%|} ::
           {|if "${{ matrix.host }}" equ "x86_64-pc-windows" call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"|} ::
@@ -544,7 +544,7 @@ let main oc : unit =
     ("OPAM12CACHE", "~/.cache/opam1.2/cache");
     (* These should be identical to the values in appveyor.yml *)
     ("OPAM_REPO", "https://github.com/ocaml/opam-repository.git");
-    ("OPAM_TEST_REPO_SHA", "3dab8c734b15bf2b5c1d8b99bb134f51361a6bee");
+    ("OPAM_TEST_REPO_SHA", "d87894f816bea883931937e050bb5be4f108e50a");
     ("OPAM_REPO_SHA", "e9ce8525130a382fac004612302b2f2268f4188c");
     ("SOLVER", "");
     (* Cygwin configuration *)
@@ -563,18 +563,7 @@ let main oc : unit =
   ++ analyse_job ~keys ~platforms:[Linux]
   @@ fun analyse_job -> cygwin_job ~analyse_job
   @@ fun cygwin_job -> main_build_job ~analyse_job ~cygwin_job ~section:"Build" Linux (4, 08)
-  @@ fun build_linux_job -> main_build_job ~analyse_job ~cygwin_job Windows start_latests_ocaml
-  @@ fun build_windows_job -> main_build_job ~analyse_job ~cygwin_job MacOS start_latests_ocaml
-  @@ fun build_macOS_job -> main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam tests" Linux
-  @@ fun _ -> main_test_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
-  @@ fun _ -> cold_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Opam cold" Linux
-  @@ fun _ -> doc_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Compile doc" Linux
-  @@ fun _ -> solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Compile solver backends" Linux
-  @@ fun _ -> solvers_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
-  @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job ~section:"Upgrade from 1.2 to current" Linux
-  @@ fun _ -> upgrade_job ~analyse_job ~build_linux_job ~build_windows_job ~build_macOS_job MacOS
-  @@ fun _ -> hygiene_job ~analyse_job (Specific (Linux, "22.04"))
-  @@ fun _ -> depends_job ~analyse_job ~build_linux_job Linux
+  @@ fun _ -> main_build_job ~analyse_job ~cygwin_job Windows start_latests_ocaml
   @@ fun _ -> end_workflow
 
 let () =

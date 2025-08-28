@@ -23,6 +23,9 @@ archive-mirrors: "https://opam.ocaml.org/cache"
 EOF
 opam switch create default ocaml-system
 eval $(opam env)
+if [[ "${CYGWIN_TEST:-0}" -eq 1 ]]; then
+  opam pin add dune git+https://github.com/Alizter/dune.git#ci-cygwin
+fi
 opam install lwt
 opam list
 opam config report
