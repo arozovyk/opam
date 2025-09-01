@@ -357,7 +357,7 @@ val get_lock_fd: lock -> Unix.file_descr
     Allowing unclean applications imitates the default behaviour of GNU Patch. *)
 val patch: allow_unclean:bool -> dir:string ->
   [ `Patch_file of string | `Patch_diffs of Patch.t list] ->
-  [`Patched of Patch.operation list | `Exception of exn]
+  (Patch.operation list, exn) result
 
 (** Returns the end-of-line encoding style for the given file. [None] means that
     either the encoding of line endings is mixed, or the file contains no line

@@ -543,8 +543,8 @@ let apply_repo_update repo repo_root = function
     in
     if not (OpamConsole.debug ()) then OpamFilename.remove f;
     (match patch_result with
-     | `Patched diffs -> Done diffs
-     | `Exception exn -> raise exn)
+     | Ok diffs -> Done diffs
+     | Error e -> raise e)
   | Update_empty ->
     OpamConsole.msg "[%s] no changes from %s\n"
       (OpamConsole.colorise `green

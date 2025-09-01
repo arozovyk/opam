@@ -288,7 +288,7 @@ val remove_suffix: Base.t -> t -> string
     Allowing unclean applications imitates the default behaviour of GNU Patch. *)
 val patch: allow_unclean:bool ->
   [`Patch_file of string | `Patch_diffs of Patch.t list ] -> Dir.t ->
-  [`Exception of exn | `Patched of Patch.operation list ]
+  (Patch.operation list, exn) result
 
 (** Create an empty file *)
 val touch: t -> unit

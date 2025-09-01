@@ -1667,7 +1667,7 @@ let patch ~allow_unclean ~dir patch_source =
   match patch_source with
   | `Patch_diffs diffs ->
     internal_patch ~allow_unclean ~patch_filename:dir ~dir diffs;
-    `Patched (List.map (fun d -> Patch.(d.operation)) diffs)
+    Ok (List.map (fun d -> Patch.(d.operation)) diffs)
   | `Patch_file p ->
     if not (Sys.file_exists p) then
       (OpamConsole.error "Patch file %S not found." p;
@@ -1682,8 +1682,8 @@ let patch ~allow_unclean ~dir patch_source =
       let diffs = Patch.parse ~p:1 content in
       internal_patch ~allow_unclean ~patch_filename:p ~dir diffs;
       if not (OpamConsole.debug ()) then Sys.remove p';
-      `Patched (List.map (fun d -> Patch.(d.operation)) diffs)
-    with exn -> `Exception exn
+      Ok (List.map (fun d -> Patch.(d.operation)) diffs)
+    with exn -> Error exn
 
 let register_printer () =
   Printexc.register_printer (function
