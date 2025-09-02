@@ -1680,12 +1680,12 @@ let patch ~allow_unclean ~dir patch_source =
   match patch_source with
   | `Patch_diffs diffs ->
     internal_patch ~allow_unclean ~patch_filename:dir ~dir diffs;
-    Ok (List.map (fun d -> Patch.(d.operation)) diffs)
+    Ok (List.map (fun d -> d.Patch.operation) diffs)
   | `Patch_file p ->
     try
       let diffs = parse_patch_file ~dir p in
       internal_patch ~allow_unclean ~patch_filename:p ~dir diffs;
-      Ok (List.map (fun d -> Patch.(d.operation)) diffs)
+      Ok (List.map (fun d -> d.Patch.operation) diffs)
     with exn -> Error exn
 
 let register_printer () =

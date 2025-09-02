@@ -116,7 +116,7 @@ let strip_repo_suffix d =
     | Some (_, r) -> r
   in
   let operation=
-    match Patch.(d.operation) with
+    match d.Patch.operation with
     | Patch.Create f -> Patch.Create (rm_prefix f)
     | Patch.Delete f -> Patch.Delete (rm_prefix f)
     | Patch.Edit (f1, f2) -> Patch.Edit (rm_prefix f1, rm_prefix f2)
