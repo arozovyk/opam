@@ -374,6 +374,11 @@ val get_eol_encoding : string -> bool option
 *)
 val translate_patch: dir:string -> string -> string -> unit
 
+(** [parse_patch_file ~dir patch_file] processes and parses a patch file.
+    Returns the parsed patch diffs or raises an exception if the patch file
+    doesn't exist or can't be parsed. *)
+val parse_patch_file: dir:string -> string -> Patch.t list
+
 (** Create a temporary file in {i ~/.opam/logs/<name>XXX}, if [dir] is not set.
     ?auto_clean controls whether the file is automatically deleted when opam
     terminates (default: [true]). *)

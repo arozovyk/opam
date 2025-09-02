@@ -1663,25 +1663,28 @@ let internal_patch ~allow_unclean ~patch_filename ~dir diffs =
   in
   List.iter apply diffs
 
+let parse_patch_file ~dir p =
+  if not (Sys.file_exists p) then
+    (OpamConsole.error "Patch file %S not found." p;
+     raise Not_found);
+  let p' =
+    let p' = temp_file ~auto_clean:false "processed-patch" in
+    translate_patch ~dir p p';
+    p'
+  in
+  let content = read p' in
+  Fun.protect (fun () -> Patch.parse ~p:1 content)
+    ~finally:(fun () -> if not (OpamConsole.debug ()) then Sys.remove p')
+
 let patch ~allow_unclean ~dir patch_source =
   match patch_source with
   | `Patch_diffs diffs ->
     internal_patch ~allow_unclean ~patch_filename:dir ~dir diffs;
     Ok (List.map (fun d -> Patch.(d.operation)) diffs)
   | `Patch_file p ->
-    if not (Sys.file_exists p) then
-      (OpamConsole.error "Patch file %S not found." p;
-       raise Not_found);
-    let p' =
-      let p' = temp_file ~auto_clean:false "processed-patch" in
-      translate_patch ~dir p p';
-      p'
-    in
-    let content = read p' in
     try
-      let diffs = Patch.parse ~p:1 content in
+      let diffs = parse_patch_file ~dir p in
       internal_patch ~allow_unclean ~patch_filename:p ~dir diffs;
-      if not (OpamConsole.debug ()) then Sys.remove p';
       Ok (List.map (fun d -> Patch.(d.operation)) diffs)
     with exn -> Error exn
 

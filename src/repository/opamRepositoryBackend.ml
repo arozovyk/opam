@@ -15,8 +15,7 @@ let slog = OpamConsole.slog
 
 type update =
   | Update_full of dirname
-  | Update_patch of filename
-  | Update_diffs of (filename * Patch.t list)
+  | Update_patch of (filename * Patch.t list)
   | Update_empty
   | Update_err of exn
 

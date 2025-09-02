@@ -372,25 +372,26 @@ let diff_patch dir setup =
         print "ERROR: %s\n" (rm_hex @@ Printexc.to_string e);
         None
       | None -> print "No diff\n"; None
-      | some -> some
+      | Some (f,_) -> Some f
   in
   match diff with
   | None -> ()
   | Some diff ->
     if git then make_git_repo dir;
-    print "%s\n" (OpamFilename.read diff);
+    print "%s\n" (OpamFilename.to_string diff);
     let apply ~git diff =
       let git = if git then "GIT " else "" in
       let result =
-        OpamFilename.patch ~allow_unclean:false diff
+        OpamFilename.patch ~allow_unclean:false
+          (`Patch_file (OpamFilename.to_string diff))
           (dir / first)
       in
       match result with
-      | `Patched _ ->
+      | Ok _ ->
         print "*** %sPATCHED ***\n" git;
         print_dirs dir;
         true
-      | `Exception exn ->
+      | Error exn ->
         print "*** %sPATCH ERROR ***\n" git;
         print "ERROR: %s\n" (rm_hex @@ Printexc.to_string exn);
         false

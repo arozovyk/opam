@@ -490,8 +490,7 @@ let validate_repo_update repo repo_root update =
         | "anchors", _ -> Some (S (String.concat "," ta.fingerprints))
         | "quorum", _ -> Some (S (string_of_int ta.quorum))
         | "repo", _ -> Some (S (OpamFilename.Dir.to_string repo_root))
-        | "patch", Update_patch f -> Some (S (OpamFilename.to_string f))
-        | "patch", Update_diffs (f, _) -> Some (S (OpamFilename.to_string f))
+        | "patch", Update_patch (f, _)  -> Some (S (OpamFilename.to_string f))
         | "incremental", Update_patch _ -> Some (B true)
         | "incremental", _ -> Some (B false)
         | "dir", Update_full d -> Some (S (OpamFilename.Dir.to_string d))
@@ -526,7 +525,7 @@ let apply_repo_update repo repo_root = function
       (OpamConsole.colorise `green
          (OpamRepositoryName.to_string repo.repo_name));
     Done []
-  | Update_patch f | Update_diffs (f, _) as update ->
+  | Update_patch (f, diffs)  ->
     OpamConsole.msg "[%s] synchronised from %s\n"
       (OpamConsole.colorise `green
          (OpamRepositoryName.to_string repo.repo_name))
@@ -534,12 +533,8 @@ let apply_repo_update repo repo_root = function
     log "%a: applying patch update at %a"
       (slog OpamRepositoryName.to_string) repo.repo_name
       (slog OpamFilename.to_string) f;
-    let patch_source =
-      match update with
-      | Update_diffs (_, diffs) -> `Patch_diffs diffs
-      | _ -> (`Patch_file (OpamFilename.to_string f)) in
     let patch_result =
-      OpamFilename.patch ~allow_unclean:false patch_source repo_root
+      OpamFilename.patch ~allow_unclean:false (`Patch_diffs diffs) repo_root
     in
     if not (OpamConsole.debug ()) then OpamFilename.remove f;
     (match patch_result with
@@ -559,7 +554,7 @@ let cleanup_repo_update upd =
   if not (OpamConsole.debug ()) then
     match upd with
     | Update_full d -> OpamFilename.rmdir d
-    | Update_patch f -> OpamFilename.remove f
+    | Update_patch (f, _) -> OpamFilename.remove f
     | _ -> ()
 
 let update repo repo_root =
@@ -572,7 +567,7 @@ let update repo repo_root =
     apply_repo_update repo repo_root Update_empty @@+ fun _ ->
     B.repo_update_complete repo_root repo.repo_url @@+ fun () ->
     Done `No_changes
-  | (Update_full _ | Update_patch _ | Update_diffs _) as upd ->
+  | (Update_full _ | Update_patch _) as upd ->
     OpamProcess.Job.catch (fun exn ->
         cleanup_repo_update upd;
         raise exn)
