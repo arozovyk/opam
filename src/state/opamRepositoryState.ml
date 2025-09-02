@@ -125,7 +125,9 @@ let load_opams_incremental repo_name repo_root diffs rt =
       if is_removal then
         OpamPackage.Map.remove nv acc
       else
-        let package_dir = OpamFilename.dirname (OpamFilename.Op.(repo_root // file)) in
+        let package_dir =
+          OpamFilename.dirname OpamFilename.Op.(repo_root // file)
+        in
         match
           OpamFileTools.read_repo_opam ~repo_name ~repo_root package_dir
         with

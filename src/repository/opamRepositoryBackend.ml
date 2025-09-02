@@ -109,13 +109,13 @@ let get_files_for_diff parent_dir dir1 dir2 =
 (* Needed to be coherent with vcs patches that do not have repo name suffix *)
 let strip_repo_suffix d =
   let rm_prefix f =
-    match (OpamStd.String.cut_at f '/') with
+    match OpamStd.String.cut_at f '/' with
     | None ->
       log "Warning: failed to remove prefix of %s" f;
       f
     | Some (_, r) -> r
   in
-  let operation=
+  let operation =
     match d.Patch.operation with
     | Patch.Create f -> Patch.Create (rm_prefix f)
     | Patch.Delete f -> Patch.Delete (rm_prefix f)
