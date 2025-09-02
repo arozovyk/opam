@@ -154,8 +154,7 @@ let load_opams_incremental repo_name repo_root diffs rt =
       | Patch.Delete_only -> remove_file file1 acc
       | Patch.Create_only -> add_file file2 acc
   in
-  List.fold_left (fun acc o -> process_operation acc o)
-    existing_opams diffs
+  List.fold_left process_operation existing_opams diffs
 
 let load_repo repo repo_root =
   let t = OpamConsole.timer () in
