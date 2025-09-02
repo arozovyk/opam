@@ -564,7 +564,8 @@ let update repo repo_root =
   | Update_err e -> raise e
   | Update_empty ->
     log "update empty, no validation performed";
-    apply_repo_update repo repo_root Update_empty @@+ fun _ ->
+    apply_repo_update repo repo_root Update_empty @@+ fun diffs ->
+    assert (diffs = []);
     B.repo_update_complete repo_root repo.repo_url @@+ fun () ->
     Done `No_changes
   | (Update_full _ | Update_patch _) as upd ->
