@@ -141,9 +141,7 @@ let load_opams_incremental repo_name repo_root diffs rt =
   let add_file file acc = process_file acc file ~is_removal:false in
   let process_operation acc = function
     | Patch.Edit (old_file, new_file) ->
-      if OpamFilename.Dir.equal
-          (OpamFilename.Dir.of_string old_file)
-          (OpamFilename.Dir.of_string new_file)
+      if String.equal old_file new_file
       then
         add_file new_file acc
       else
