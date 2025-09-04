@@ -378,13 +378,11 @@ let diff_patch dir setup =
   | None -> ()
   | Some diff ->
     if git then make_git_repo dir;
-    print "%s\n" (OpamFilename.to_string diff);
+    print "%s\n" (OpamFilename.read diff);
     let apply ~git diff =
       let git = if git then "GIT " else "" in
       let result =
-        OpamFilename.patch ~allow_unclean:false
-          (`Patch_file (OpamFilename.to_string diff))
-          (dir / first)
+        OpamFilename.patch ~allow_unclean:false(`Patch_file diff) (dir / first)
       in
       match result with
       | Ok _ ->
