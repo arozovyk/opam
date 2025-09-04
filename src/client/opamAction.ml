@@ -371,8 +371,7 @@ let prepare_package_build env opam nv dir =
         Ok []
       else
         OpamFilename.patch ~allow_unclean:true
-          (`Patch_file (OpamFilename.to_string
-                          (dir // OpamFilename.Base.to_string base))) dir
+          (`Patch_file (dir // OpamFilename.Base.to_string base)) dir
     in
     let rec aux = function
       | [] -> []

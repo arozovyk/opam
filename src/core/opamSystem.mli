@@ -348,16 +348,14 @@ val get_lock_fd: lock -> Unix.file_descr
 
 (** {2 Misc} *)
 
-(** Apply a patch in the current directory. Takes either a patch file path or
-    a list of patch diffs. Returns [`Patched patches] on success with the list
-    of applied patch operations, [`Exception exn] on error.
+(** [patch ~allow_unclean ?patch_filename ~dir diffs] applies a patch to
+    directory [dir].
 
     @param allow_unclean decides if applying a patch on a directory which
     differs slightly from the one described in the patch file is allowed.
     Allowing unclean applications imitates the default behaviour of GNU Patch. *)
-val patch: allow_unclean:bool -> dir:string ->
-  [ `Patch_file of string | `Patch_diffs of Patch.t list] ->
-  (Patch.operation list, exn) result
+val patch: allow_unclean:bool -> ?patch_filename:string -> dir:string ->
+  Patch.t list -> unit
 
 (** Returns the end-of-line encoding style for the given file. [None] means that
     either the encoding of line endings is mixed, or the file contains no line

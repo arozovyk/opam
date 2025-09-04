@@ -280,14 +280,11 @@ val remove_suffix: Base.t -> t -> string
     The patch source can be either [`Patch_file filename] for a patch file, or
     [`Patch_diffs diffs] for a list of file-level changes.
 
-    Returns [`Patched operations] on success with the list of applied patch
-    operations, or [`Exception exn] on error.
-
     @param allow_unclean decides if applying a patch on a directory which
     differs slightly from the one described in the patch file is allowed.
     Allowing unclean applications imitates the default behaviour of GNU Patch. *)
 val patch: allow_unclean:bool ->
-  [`Patch_file of string | `Patch_diffs of Patch.t list ] -> Dir.t ->
+  [`Patch_file of t | `Patch_diffs of Patch.t list ] -> Dir.t ->
   (Patch.operation list, exn) result
 
 (** Create an empty file *)
