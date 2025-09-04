@@ -189,7 +189,7 @@ let get_diff parent_dir dir1 dir2 =
     log "Internal diff (empty) done in %.2fs." (chrono ());
     None
   | diffs ->
-    log "Internal diff (non-empty, changed files %a) done in %.2fs."
+    log "Internal diff (non-empty, %a changed files) done in %.2fs."
       (fun fmt l -> Format.pp_print_int fmt (List.length l)) diffs (chrono ());
     let patch = OpamSystem.temp_file ~auto_clean:false "patch" in
     let patch_file = OpamFilename.of_string patch in
