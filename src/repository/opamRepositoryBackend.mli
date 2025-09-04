@@ -19,8 +19,8 @@ type update =
   (** No previous known state, the full contents have been put in the given
       temporary directory *)
   | Update_patch of (filename * Patch.t list)
-  (** The list of file-level operation to apply to a local repository in order
-      to get it to the upstream state *)
+  (** A patch file and its and its list of file-level operation to apply to a
+      local repository in order to get it to the upstream state *)
   | Update_empty
   (** The repository is already up to date *)
   | Update_err of exn
