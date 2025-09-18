@@ -28,6 +28,13 @@ val status_empty: status
 
 val string_of_status: status -> string
 
+(** System package availability *)
+type availability_mode =
+  | Available of Set.t (** Set of available system packages *)
+  | Suppose_available (** In this system, all packages are considered
+                          available *)
+  | No_depexts (** Depext system disabled *)
+
 (** System packages to install. We need to split per purpose as some
     distribution need to keep up-to-date already installed system packages. See
     {!OpamSysInteract.install_packages_commands_t}. *)

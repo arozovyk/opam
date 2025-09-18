@@ -67,6 +67,12 @@ let string_of_status sp =
     (Set.to_string sp.s_available)
     (Set.to_string sp.s_not_found)
 
+(* System package availability *)
+type availability_mode =
+  | Available of Set.t
+  | Suppose_available
+  | No_depexts
+
 (** System packages to install *)
 
 type to_install = {
