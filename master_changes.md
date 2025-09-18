@@ -125,6 +125,7 @@ users)
 
 ## Client
   * [NEW] Fetch shared archive sources without checksums [#6627 @psafont - fix #5638]
+  * Improved depexts handling by caching system package availability during update, avoiding redundant system checks at install time. [#6489 @arozovyk fix #6461]
 
 ## Shell
 
@@ -220,6 +221,9 @@ users)
 # API updates
 ## opam-client
   * `OpamClientConfig.opam_init`: now takes an optional `auto_answer` argument [#6709 @kit-ty-kate]
+  * `OpamSolution` remove the heuristic of recomputing depexts of additional (pinned) packages. [#6489 @arozovyk fix #6461]
+  * `OpamClient` update the system package status check for dependencies during `opam install --deps-only`, including support for pinned packages; also update this in `OpamAuxCommands.autopin` [#6489 @arozovyk fix #6461]
+  * `OpamSolution.get_depexts` remove no longer needed `recover` option that was used with `--depext-only` option  [#6489 @arozovyk fix #6461]
 
 ## opam-repository
   * `OpamLocal.rsync_*`: Change the return type from `OpamFilename.*` to `unit` [#6658 @kit-ty-kate]
@@ -232,10 +236,13 @@ users)
   * `OpamSwitchState.overlay_opam_file`: was added [6679 @rjbou]
   * `OpamRepositoryState` add `load_opams_from_diff` to update package definitions based on file change operations (diff) [#6614 @arozovyk]
   * `OpamRepositoryState.get_repo_files`: was added [#6679 @kit-ty-kate @rjbou]
+  * `OpamSwitchState`: add `update_sys_packages` to update depexts status of a set of packages. [#6489 @arozovyk]
   * `OpamSysInteract`: add `available_packages` and `installed_packages` to be computed separately, redefine `packages_status` accordingly [#6489 @arozovyk]
   * `OpamStateTypes`: add available system package status field in `repos_state` for all the depexts declared in repo's packages. The new field is also added to the cache [#6489 @arozovyk fix #6461]
   * `OpamRepositoryState.load`: load repo's available system packages [#6489 @arozovyk fix #6461]
   * `OpamFileTools`: add `get_depexts` to consolidate depexts extraction logic from individual opam files and package maps [#6489 @arozovyk fix #6461]
+  * `OpamSwitchState.update_sys_packages` check for availability of packages in `repo_state` when updating the depexts status of additional packages [#6489 @arozovyk fix #6461]
+  * `OpamFileTools`: add `get_depexts` to consolidate depexts extraction logic from individual opam files and package maps [#6489 @arozovyk]
 
 ## opam-solver
 

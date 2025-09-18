@@ -107,5 +107,11 @@ The following system packages will first need to be installed:
 ### :I:7: Not available
 ### opam switch create not-avail --empty
 ### OPAMVAR_os_family=dummy-success::something-else opam install foo --depext-only
-[ERROR] Package foo depends on the unavailable system package 'sys-foo'. You can use `--no-depexts' to attempt installation anyway.
-# Return code 5 #
+
+The following system packages will first need to be installed:
+    sys-foo
+
+<><> Handling external dependencies <><><><><><><><><><><><><><><><><><><><><><>
+
++ /bin/echo "sys-foo"
+- sys-foo
