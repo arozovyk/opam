@@ -380,8 +380,8 @@ opam-version: "2.0"
 name: "$name"
 version: "$version"
 EOF
-echo "file1" > "$pkgdir/files/1"
-echo "file2" > "$pkgdir/files/k/1"
+printf "file1" > "$pkgdir/files/1"
+printf "file2" > "$pkgdir/files/k/1"
 md5_1=$(openssl md5 "$pkgdir/files/1" | awk '{print $NF}')
 md5_k1=$(openssl md5 "$pkgdir/files/k/1" | awk '{print $NF}')
 cat >> "$pkgdir/opam" <<EOF
