@@ -173,6 +173,8 @@ users)
   * Add a test for `opam remove --force` [#6672 @rjbou]
   * Use the new `opam-set-os` command when applicable [#6741 @arozovyk]
   * Add more tests for depexts behaviour with unknown family types [#6489 @arozovyk]
+  * Use the new `opam-set-os` command when applicable [#6489 @arozovyk]
+  * Add depexts tests with debug section that demonstrate system availability polling [#6489 @arozovyk]
 
 ### Engine
   * Fix gcc < 14.3 bug on mingw i686 [#6624 @kit-ty-kate]
