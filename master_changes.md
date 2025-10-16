@@ -182,6 +182,7 @@ users)
   * Add the `unset` builtin [#6708 @kit-ty-kate]
   * Add the `sed-hash` command to replace hashes in opam output [#XXX @rjbou]
   * Add `opam-set-os` command for reftests that combines setting global `os-family` variable. [#6741 @arozovyk]
+  * Add a silent `opam update` to `opam-set-os` command [#6741 @arozovyk]
 
 ## Github Actions
   * bump `actions/checkout` from 4 to 5 [#6643 @kit-ty-kate]

@@ -77,7 +77,7 @@ output...
   * `opam-cache repo [nvs]`: print the content of repository cache. If
     `[nvs]` is specified, filter over these package names or packages.
   * `unset FOO` unset variables from environment
-  * `opam-set-os <os-family>` combines setting global `os-family` variable
+  * `opam-set-os <os-family>` combines setting global `os-family` followed by a (silent) `opam update`.
 
 - if you need more shell power, create a script using <FILENAME> then run it.
   Or just use `sh -c`... but beware for compatibility.
