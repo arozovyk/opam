@@ -456,17 +456,24 @@ module Env : sig
   module Name : sig
     include ABSTRACT with type t = private string
 
+    (** Compares an environment variable name with a string using OS-appropriate case sensitivity *)
     val equal_string: t -> string -> bool
 
   end
 
+  (** Gets the value of an environment variable by name. Raises [Not_found] if not set *)
   val get: string -> string
 
+  (** Gets the value of an environment variable by name, returns [None] if not set *)
   val getopt: string -> string option
 
+  (** [getopt_full name] returns the canonical name and value of an environment variable *)
   val getopt_full: Name.t -> Name.t * string option
 
+  (** Returns the list of all environment variables as (name, value) pairs *)
   val list: unit -> (Name.t * string) list
+
+  (** Returns the raw environment array *)
   val raw_env: unit -> string array
 
   (** [cyg_env ~env ~cygbin ~git_location] returns [env] environment with its
