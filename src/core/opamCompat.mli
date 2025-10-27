@@ -9,45 +9,45 @@
 (**************************************************************************)
 
 module String : sig
-  (* NOTE: OCaml >= 4.13 *)
+  (** Tests if at least one character satisfies the predicate (OCaml >= 4.13) *)
   val exists: (char -> bool) -> string -> bool
 
-  (* NOTE: OCaml >= 4.13 *)
+  (** Tests if a string starts with the given prefix (OCaml >= 4.13) *)
   val starts_with: prefix:string -> string -> bool
 
-  (* NOTE: OCaml >= 4.13 *)
+  (** Tests if a string ends with the given suffix (OCaml >= 4.13) *)
   val ends_with: suffix:string -> string -> bool
 
-  (* NOTE: OCaml >= 4.13 *)
+  (** Tests if all characters satisfy the predicate (OCaml >= 4.13) *)
   val for_all: (char -> bool) -> string -> bool
 
-  (* NOTE: OCaml >= 4.13 *)
+  (** Left-associative fold over the characters of a string (OCaml >= 4.13) *)
   val fold_left: ('a -> char -> 'a) -> 'a -> string -> 'a
 end
 
 module Seq : sig
-  (* NOTE: OCaml >= 4.14 *)
+  (** Finds the first element of a sequence for which the function returns [Some] (OCaml >= 4.14) *)
   val find_map: ('a -> 'b option) -> 'a Seq.t -> 'b option
 end
 
 module Either : sig
-  (* NOTE: OCaml >= 4.12 *)
+  (** Either type for representing a value of one of two possible types (OCaml >= 4.12) *)
   type ('a, 'b) t =
     | Left of 'a
     | Right of 'b
 end
 
 module Lazy : sig
-  (* NOTE: OCaml >= 4.13 *)
+  (** Maps a function over a lazy value (OCaml >= 4.13) *)
   val map : ('a -> 'b) -> 'a Lazy.t -> 'b Lazy.t
 
-  (* NOTE: OCaml >= 4.13 *)
+  (** Maps a function over a lazy value, preserving already-forced status (OCaml >= 4.13) *)
   val map_val: ('a -> 'b) -> 'a Lazy.t -> 'b Lazy.t
 end
 
 module Unix : sig
-  (* `realpath` for OCaml >= 4.13.0,
-     implementation with double chdir otherwise *)
+  (** Returns the canonicalized absolute pathname. Uses [realpath] for OCaml >= 4.13.0,
+      implementation with double chdir otherwise *)
   val realpath: string -> string
 end
 
