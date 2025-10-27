@@ -39,12 +39,15 @@ exception Aborted
     which raised exceptions, and third one those which were canceled. *)
 exception Errors of int list * (int * exn) list * int list
 
+(** Iterates over a list, running up to [jobs] commands in parallel *)
 val iter: jobs:int -> command:('a -> unit OpamProcess.job) -> ?dry_run:bool ->
   'a list -> unit
 
+(** Maps a function over a list, running up to [jobs] commands in parallel *)
 val map: jobs:int -> command:('a -> 'b OpamProcess.job) -> ?dry_run:bool ->
   'a list -> 'b list
 
+(** Reduces a list by running commands in parallel and merging results with [merge] *)
 val reduce: jobs:int -> command:('a -> 'b OpamProcess.job) ->
   merge:('b -> 'b -> 'b) -> nil:'b -> ?dry_run:bool ->
   'a list -> 'b
