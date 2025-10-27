@@ -75,6 +75,8 @@ val parse_update: string -> string * update_op
     Raise [Invalid_argument] if the string is malformed *)
 val parse_whole: string -> string * whole_op
 
+(** Converts an update operation to a whole operation (overwrite or revert only).
+    @raise Not_found if the operation is an append operation *)
 val whole_of_update_op: update_op -> whole_op
 
 (** [set_opt_global gt field value] updates global config field with update
