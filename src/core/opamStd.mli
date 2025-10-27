@@ -327,6 +327,7 @@ module String : sig
       [split_quoted "foo\";\"bar;baz" ';' = ["foo;bar"; "baz"]] *)
   val split_quoted: string -> char -> string list
 
+  (** Returns [true] if the string contains only hexadecimal characters (0-9, A-F, a-f) *)
   val is_hex: string -> bool
 
 end
