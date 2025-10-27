@@ -141,16 +141,22 @@ module IntSet: SET with type elt = int
 module Option: sig
   val default: 'a -> 'a option -> 'a
 
+  (** Returns the first option if it is [Some], otherwise returns the second option *)
   val default_map: 'a option -> 'a option -> 'a option
 
+  (** [replace f opt] applies [f] to the value in [opt] if it exists, or returns [None] *)
   val replace : ('a -> 'b option) -> 'a option -> 'b option
 
+  (** [map_default f dft opt] applies [f] to the value in [opt] if it exists, otherwise returns [dft] *)
   val map_default: ('a -> 'b) -> 'b -> 'a option -> 'b
 
+  (** [equal_some eq x opt] checks if [opt] is [Some y] and [eq x y] is true *)
   val equal_some : ('a -> 'a -> bool) -> 'a -> 'a option -> bool
 
+  (** Convert an option to a string using the provided function. Uses [none] string for [None] values *)
   val to_string: ?none:string -> ('a -> string) -> 'a option -> string
 
+  (** Always returns [None], regardless of the input *)
   val none: 'a -> 'b option
 
   (** [of_Not_found f x] calls [f x], catches [Not_found] and returns [None] *)
