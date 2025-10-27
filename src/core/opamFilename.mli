@@ -256,8 +256,10 @@ val extract_job: t -> Dir.t -> exn option OpamProcess.job
 (** Extract an archive in a given directory *)
 val extract_in: t -> Dir.t -> unit
 
+(** Same as [extract_in], as an OpamProcess.job *)
 val extract_in_job: t -> Dir.t -> exn option OpamProcess.job
 
+(** Create a tar.gz archive from a directory, as an OpamProcess.job *)
 val make_tar_gz_job: t -> Dir.t -> exn option OpamProcess.job
 
 (** Extract a generic file *)
