@@ -12,6 +12,7 @@
 type t
 include OpamStd.ABSTRACT with type t := t
 
+(** Converts a set of strings to a set of system packages *)
 val raw_set: OpamStd.String.Set.t -> Set.t
 
 (** System packages status *)
@@ -24,8 +25,10 @@ type status =
     (** Package unavailable on this system *)
   }
 
+(** Empty status record with no packages *)
 val status_empty: status
 
+(** Converts a status record to a human-readable string *)
 val string_of_status: status -> string
 
 (** System packages to install. We need to split per purpose as some
@@ -40,6 +43,8 @@ type to_install =
     (** Package to install required by already install opam packages *)
   }
 
+(** Empty to_install record with no packages *)
 val to_install_empty: to_install
 
+(** Converts a to_install record to a human-readable string *)
 val string_of_to_install: to_install -> string
