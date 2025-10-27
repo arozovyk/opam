@@ -225,6 +225,7 @@ val readlink: t -> t
 (** Is a symlink? *)
 val is_symlink: t -> bool
 
+(** Checks if a directory path is a symlink *)
 val is_symlink_dir: Dir.t -> bool
 
 (** Is an executable? *)
