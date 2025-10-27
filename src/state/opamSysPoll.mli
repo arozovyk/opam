@@ -15,12 +15,23 @@ open OpamStateTypes
 
 (** Functions to get host specification. It checks if variables value is
     defined in the environment map before polling. *)
+
+(** Returns the system architecture (e.g., "x86_64", "arm64") *)
 val arch: gt_variables -> string option
+
+(** Returns the operating system name (e.g., "linux", "macos", "win32") *)
 val os: gt_variables -> string option
+
+(** Returns the OS distribution name (e.g., "ubuntu", "debian", "fedora") *)
 val os_distribution: gt_variables -> string option
+
+(** Returns the OS version string *)
 val os_version: gt_variables -> string option
+
+(** Returns the OS family (e.g., "debian", "rhel", "arch") *)
 val os_family: gt_variables -> string option
 
+(** List of all available system variables with their lazy-evaluated values *)
 val variables: (OpamVariable.t * OpamTypes.variable_contents option Lazy.t) list
 
 (** The function used internally to get our canonical names for architectures
@@ -33,7 +44,7 @@ val normalise_arch: string -> string
     the output of [uname -s] *)
 val normalise_os: string -> string
 
-(* Number of cores *)
+(** Returns the number of CPU cores available on the system *)
 val cores: unit -> int
 
 (** Returns a string containing arch, os, os-distribution & os-version values,
