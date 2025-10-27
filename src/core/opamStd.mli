@@ -250,6 +250,7 @@ end
 
 module Char : sig
 
+  (** Returns [true] if the character is a whitespace character (space, tab, carriage return, or newline) *)
   val is_whitespace : char -> bool
 
 end
@@ -270,8 +271,13 @@ module String : sig
 
   (** {3 Checks} *)
 
+  (** [contains ~sub str] checks if [sub] is a substring of [str] *)
   val contains: sub:string -> string -> bool
+
+  (** [exact_match re str] checks if the regular expression [re] matches the entire string [str] *)
   val exact_match: Re.re -> string -> bool
+
+  (** [find_from pred str pos] finds the first position at or after [pos] in [str] where [pred] is true *)
   val find_from: (char -> bool) -> string -> int -> int
 
   (** Like {!Stdlib.String.compare}, but with lowercase/uppercase variants
