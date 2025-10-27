@@ -783,12 +783,15 @@ module Config : sig
   module E : sig
     type t = ..
     type t += REMOVED
+    (** Finds and returns the first configuration value that matches the predicate *)
     val find: (t -> 'a option) -> 'a
-    (* Lazy *)
+    (** Returns a lazy function to retrieve configuration values *)
     val value: (t -> 'a option) -> (unit -> 'a option)
-    (* Not lazy *)
+    (** Returns the current configuration value (not lazy) *)
     val value_t: (t -> 'a option) -> 'a option
+    (** Updates the configuration with a single value *)
     val update: t -> unit
+    (** Updates the configuration with multiple values *)
     val updates: t list -> unit
   end
 
@@ -798,12 +801,20 @@ end
     We use this module in opam codebase to flag polymorphic comparison usage.
 *)
 module Compare : sig
+  (** Polymorphic comparison function *)
   val compare: 'a -> 'a -> int
+  (** Polymorphic equality test *)
   val equal: 'a -> 'a -> bool
+  (** Polymorphic equality operator *)
   val (=): 'a -> 'a -> bool
+  (** Polymorphic inequality operator *)
   val (<>): 'a -> 'a -> bool
+  (** Polymorphic less-than operator *)
   val (<): 'a -> 'a -> bool
+  (** Polymorphic greater-than operator *)
   val (>): 'a -> 'a -> bool
+  (** Polymorphic less-than-or-equal operator *)
   val (<=): 'a -> 'a -> bool
+  (** Polymorphic greater-than-or-equal operator *)
   val (>=): 'a -> 'a -> bool
 end
