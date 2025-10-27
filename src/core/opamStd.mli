@@ -286,10 +286,19 @@ module String : sig
 
   (** {3 Manipulation} *)
 
+  (** Remove leading and trailing whitespace from a string *)
   val strip: string -> string
+
+  (** Remove trailing whitespace from a string *)
   val strip_right: string -> string
+
+  (** [sub_at n str] returns the substring of [str] starting at position [n] *)
   val sub_at: int -> string -> string
+
+  (** [remove_prefix ~prefix str] removes [prefix] from the beginning of [str] if present *)
   val remove_prefix: prefix:string -> string -> string
+
+  (** [remove_suffix ~suffix str] removes [suffix] from the end of [str] if present *)
   val remove_suffix: suffix:string -> string -> string
 
   (** [is_prefix_of from full str] returns true if [str] if a prefix of [full],
