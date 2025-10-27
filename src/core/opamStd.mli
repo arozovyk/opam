@@ -163,10 +163,19 @@ module Option: sig
   val of_Not_found: ('a -> 'b) -> 'a -> 'b option
 
   module Op: sig
+    (** Monadic bind operator for options: applies the function if [Some], returns [None] otherwise *)
     val (>>=): 'a option -> ('a -> 'b option) -> 'b option
+
+    (** Map operator for options: applies the function to the value if [Some], returns [None] otherwise *)
     val (>>|): 'a option -> ('a -> 'b) -> 'b option
+
+    (** [opt >>+ f] returns [opt] if it is [Some], otherwise calls [f ()] *)
     val (>>+): 'a option -> (unit -> 'a option) -> 'a option
+
+    (** [opt +! dft] returns the value in [opt] if it is [Some], otherwise returns [dft] *)
     val (+!): 'a option -> 'a -> 'a
+
+    (** Returns the first option if it is [Some], otherwise returns the second option *)
     val (++): 'a option -> 'a option -> 'a option
   end
 end
