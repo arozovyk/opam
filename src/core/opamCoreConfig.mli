@@ -31,9 +31,16 @@ module E : sig
     | VERBOSE of OpamStd.Config.level option
     | YES of bool option
 
+    (** Returns the current confirm level setting *)
     val confirmlevel: unit -> OpamStd.Config.answer option
+
+    (** Returns the current debug level setting *)
     val debug: unit -> int option
+
+    (** Returns the current log directory setting *)
     val logs: unit -> string option
+
+    (** Returns whether automatic 'yes' answer is enabled *)
     val yes: unit -> bool option
 end
 
@@ -108,14 +115,19 @@ type 'a options_fun =
   ?git_location:string ->
   'a
 
+(** Default configuration values *)
 val default : t
 
+(** Updates configuration options and returns the new configuration *)
 val set : t -> (unit -> t) options_fun
 
+(** Like [set], but applies a continuation function to the resulting configuration *)
 val setk : (t -> 'a) -> t -> 'a options_fun
 
+(** Global reference to the current configuration *)
 val r : t ref
 
+(** Updates the global configuration reference with new option values *)
 val update : ?noop:_ -> (unit -> unit) options_fun
 
 (** Sets the OpamCoreConfig options, reading the environment to get default
