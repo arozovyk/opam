@@ -222,6 +222,9 @@ type command = string list
     {!OpamProcess.default_env}. *)
 val resolve_command: ?env:string array -> ?dir:string -> string -> string option
 
+(** Checks whether the given directory contains a bash.exe executable.
+    Returns [false] on Unix systems (non-Windows, non-Cygwin), [true] on
+    Windows/Cygwin if bash.exe is found in the specified directory. *)
 val bin_contains_bash: string -> bool
 
 (** Returns a function which should be applied to arguments for a given command
