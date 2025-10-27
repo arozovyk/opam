@@ -14,11 +14,22 @@
 (** Global configuration parameters (read from OpamGlobalConfig, and the
     environment when necessary) *)
 
+(** Returns whether debug mode is enabled *)
 val debug: unit -> bool
+
+(** Returns whether verbose mode is enabled *)
 val verbose: unit -> bool
+
+(** Returns whether colored output is enabled *)
 val color: unit -> bool
+
+(** Returns whether UTF-8 output is enabled *)
 val utf8: unit -> bool
+
+(** Returns whether extended UTF-8 (with emojis) is enabled *)
 val utf8_extended: unit -> bool
+
+(** Returns whether status line display is enabled *)
 val disp_status_line: unit -> bool
 
 (** General text formatting *)
@@ -42,7 +53,11 @@ type text_style =
     disabled *)
 val colorise : text_style -> string -> string
 val colorise' : text_style list -> string -> string
+
+(** [acolor style] returns a function that colorizes a string with the given style *)
 val acolor : text_style -> unit -> string -> string
+
+(** [acolor_w width style fmt str] formats and colorizes [str] with given [width] and [style] *)
 val acolor_w : int -> text_style -> Format.formatter -> string -> unit
 
 module Symbols : sig
@@ -87,8 +102,13 @@ val log : string -> ?level:int -> ('a, Format.formatter, unit) format -> 'a
     stringifications *)
 val slog : ('a -> string) -> Format.formatter -> 'a -> unit
 
+(** Displays an error message with "[ERROR]" prefix *)
 val error : ('a, unit, string, unit) format4 -> 'a
+
+(** Displays a warning message with "[WARNING]" prefix *)
 val warning : ('a, unit, string, unit) format4 -> 'a
+
+(** Displays a note message with "[NOTE]" prefix *)
 val note : ('a, unit, string, unit) format4 -> 'a
 
 (** Message without prefix, reformat or newline, to stderr (useful to continue
@@ -98,9 +118,17 @@ val formatted_errmsg : ?indent:int -> ('a, unit, string, unit) format4 -> 'a
 
 val error_and_exit :
   OpamStd.Sys.exit_reason -> ('a, unit, string, 'b) format4 -> 'a
+
+(** Displays a message to stdout *)
 val msg : ('a, unit, string, unit) format4 -> 'a
+
+(** Displays a formatted message with optional indentation *)
 val formatted_msg : ?indent:int -> ('a, unit, string, unit) format4 -> 'a
+
+(** Displays a message with header formatting *)
 val header_msg : ('a, unit, string, unit) format4 -> 'a
+
+(** Displays an error header with continuation *)
 val header_error :
   ('a, unit, string, ('b, unit, string, unit) format4 -> 'b) format4 -> 'a
 
@@ -154,7 +182,10 @@ val print_table:
 module Tree : sig
   type 'elt t
 
+  (** Returns the value stored in a tree node *)
   val value: 'elt t -> 'elt
+
+  (** Returns the list of children of a tree node *)
   val children: 'elt t -> 'elt t list
 
   (** Creates a tree node. *)
