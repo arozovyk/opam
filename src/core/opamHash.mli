@@ -13,6 +13,7 @@ type kind = [ `MD5 | `SHA256 | `SHA512 ]
 
 type t
 
+(** Returns the kind of hash algorithm used *)
 val kind: t -> kind
 
 (** The list of all the possible values of kind *)
@@ -21,16 +22,27 @@ val all_kinds : kind list
 (** The value of the hash, as a string of hexadecimal characters *)
 val contents: t -> string
 
+(** Converts a hash kind to its string representation ("md5", "sha256", "sha512") *)
 val string_of_kind: kind -> string
 
+(** Creates an MD5 hash from a hexadecimal string *)
 val md5: string -> t
+
+(** Creates a SHA256 hash from a hexadecimal string *)
 val sha256: string -> t
+
+(** Creates a SHA512 hash from a hexadecimal string *)
 val sha512: string -> t
 
 include OpamStd.ABSTRACT with type t := t
 
+(** Parses a hash from a string. Accepts formats like "md5=..." or just the hash (defaults to MD5) *)
 val of_string_opt: string -> t option
+
+(** Compares hash kinds by strength (MD5 < SHA256 < SHA512) *)
 val compare_kind: kind -> kind -> int
+
+(** Tests if two hash kinds are equal *)
 val equal_kind: kind -> kind -> bool
 
 (** Check if [hash] contains only 0 *)
