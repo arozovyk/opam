@@ -697,36 +697,48 @@ module Config : sig
   type answer = [ `unsafe_yes | `all_yes | `all_no | `ask ]
   type yes_answer = [ `unsafe_yes | `all_yes ]
 
-  (* Parse a envrionement variable boolean value *)
+  (** Parse an environment variable boolean value *)
   val bool_of_string: string -> bool option
 
+  (** [env conv var] reads environment variable [var] and converts it using [conv] *)
   val env: (string -> 'a) -> string -> 'a option
 
+  (** Reads an environment variable as a boolean *)
   val env_bool: env_var -> bool option
 
+  (** Reads an environment variable as an integer *)
   val env_int: env_var -> int option
 
   type level = int
-  (* Like {!env_int}, but accept boolean values for 0 and 1 *)
+  (** Like {!env_int}, but accept boolean values for 0 and 1 *)
   val env_level: env_var -> level option
 
   type sections = int option String.Map.t
+  (** Reads an environment variable as a map of sections with optional levels *)
   val env_sections: env_var -> sections option
 
+  (** Reads an environment variable as a string *)
   val env_string: env_var -> string option
 
+  (** Reads an environment variable as a list of strings *)
   val env_string_list : env_var -> string list option
 
+  (** Reads an environment variable as a float *)
   val env_float: env_var -> float option
 
+  (** Reads an environment variable as a [when_] value *)
   val env_when: env_var -> when_ option
 
+  (** Reads an environment variable as a [when_ext] value *)
   val env_when_ext: env_var -> when_ext option
 
+  (** [resolve_when ~auto when_val] resolves a [when_] value to a boolean, using [auto] for [`Auto] *)
   val resolve_when: auto:(bool Lazy.t) -> when_ -> bool
 
+  (** Reads an environment variable as an [answer] value *)
   val env_answer: env_var -> answer option
 
+  (** Reads an environment variable as an associative list of answers *)
   val auto_answer: env_var -> (string * answer) list option
 
   module type Sig = sig
