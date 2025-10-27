@@ -15,6 +15,7 @@ type version_control = [ `git | `darcs | `hg ]
 
 type backend = [ `http | `rsync | version_control ]
 
+(** Converts a backend type to its string representation ("http", "rsync", "git", etc.) *)
 val string_of_backend: backend -> string
 
 exception Parse_error of string
@@ -50,8 +51,8 @@ val parse_opt:
 
 include OpamStd.ABSTRACT with type t := t
 
-(* [to_string_w_subpath subpath url] Return string of [url] with [subpath]
-   integrated *)
+(** [to_string_w_subpath subpath url] returns string of [url] with [subpath]
+    integrated *)
 val to_string_w_subpath: OpamFilename.SubPath.t option -> t -> string
 
 (** Dummy filler url *)
@@ -69,6 +70,7 @@ val basename: t -> string
     dropped, e.g. ["http://some.host/some/path"] becomes ["http://some.host"] *)
 val root: t -> t
 
+(** Returns [true] if the URL path ends with a '/' *)
 val has_trailing_slash: t -> bool
 
 (** Check if the URL matches an existing local directory, and return it *)
