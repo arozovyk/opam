@@ -36,10 +36,10 @@ val download_as:
 (** Software Heritage fallback *)
 module SWHID: sig
 
-  (* [archive_fallback ?timeout url dirnames] downloads archived archive from
-     SWH platform and copies it in target directory. [dirnames] is the list of
-     dirnames in which the archive will be copied:
-     string label * dirname * subpath option. *)
+  (** [archive_fallback ?timeout url dirnames] downloads archived archive from
+      SWH platform and copies it in target directory. [dirnames] is the list of
+      dirnames in which the archive will be copied:
+      string label * dirname * subpath option. *)
   val archive_fallback:
     ?max_tries:int -> OpamFile.URL.t ->
     (string * dirname * subpath option) list ->
