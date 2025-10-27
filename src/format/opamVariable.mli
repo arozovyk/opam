@@ -25,6 +25,7 @@ type variable_contents =
   | S of string
   | L of string list
 
+(** Tests if two variable contents are equal *)
 val variable_contents_equal: variable_contents -> variable_contents -> bool
 
 (** Pretty print of variable contents *)
@@ -32,9 +33,16 @@ val string_of_variable_contents: variable_contents -> string
 
 (** Variable contents constructors *)
 
+(** Creates a string variable content *)
 val string: string -> variable_contents
+
+(** Creates an integer variable content (stored as string) *)
 val int: int -> variable_contents
+
+(** Creates a boolean variable content *)
 val bool: bool -> variable_contents
+
+(** Creates a directory path variable content (converted to string) *)
 val dirname: OpamFilename.Dir.t -> variable_contents
 
 module Full: sig
@@ -56,6 +64,7 @@ module Full: sig
   (** Returns the unqualified variable name *)
   val variable: t -> variable
 
+  (** Returns [true] if the variable has global scope *)
   val is_global: t -> bool
 
   (** Return the package corresponding to the scope of the variable *)
