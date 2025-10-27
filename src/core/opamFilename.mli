@@ -376,18 +376,18 @@ module Attribute: sig
 
 end
 
-(* Subpathes handling *)
+(** Subpathes handling *)
 module SubPath: sig
 
   include OpamStd.ABSTRACT
 
-  (* Directory concatenation *)
+  (** Directory concatenation *)
   val (/): Dir.t -> t -> Dir.t
 
-  (* Directory concatenation with an optional argument *)
+  (** Directory concatenation with an optional argument *)
   val (/?): Dir.t -> t option -> Dir.t
 
-  (* Subpath string with no file separator conversion *)
+  (** Subpath string with no file separator conversion *)
   val normalised_string: t -> string
 
 end
