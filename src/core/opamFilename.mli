@@ -356,8 +356,10 @@ module Attribute: sig
 
   include OpamStd.ABSTRACT
 
+  (** Convert file attributes to a string list representation *)
   val to_string_list: t -> string list
 
+  (** Create file attributes from a string list representation *)
   val of_string_list: string list -> t
 
   (** Get remote filename *)
