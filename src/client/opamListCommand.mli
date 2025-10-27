@@ -28,6 +28,8 @@ type dependency_toggles = {
   dev: bool;
 }
 
+(** Default dependency filter settings: includes only build dependencies,
+    non-recursive, excludes optional, test, doc, and dev dependencies *)
 val default_dependency_toggles: dependency_toggles
 
 type pattern_selector = {
@@ -38,6 +40,8 @@ type pattern_selector = {
   ext_fields: bool; (** Match on raw strings in [x-foo] fields *)
 }
 
+(** Default pattern matching settings: case-insensitive glob matching
+    on name, synopsis, description, and tags fields *)
 val default_pattern_selector: pattern_selector
 
 (** Package selectors used to filter the set of packages *)
@@ -113,6 +117,8 @@ type output_format =
                            bound to, if any *)
   | Depexts            (** The external dependencies *)
 
+(** Default output format for package listings: displays package name,
+    installed version, and synopsis (or pinning target if applicable) *)
 val default_list_format: output_format list
 
 (** Gets either the current switch state, if a switch is selected, or a virtual
