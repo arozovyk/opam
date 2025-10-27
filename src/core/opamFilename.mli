@@ -148,8 +148,14 @@ val read: t -> string
 
 (** Open a channel from a given file. *)
 val open_in: t -> in_channel
+
+(** Open a binary input channel from a given file. *)
 val open_in_bin: t -> in_channel
+
+(** Open an output channel to a given file. *)
 val open_out: t -> out_channel
+
+(** Open a binary output channel to a given file. *)
 val open_out_bin: t -> out_channel
 
 (** [with_open_out_bin filename f] opens [f] and passes the out_channel to [f].
