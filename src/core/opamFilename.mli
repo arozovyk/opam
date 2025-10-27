@@ -280,6 +280,7 @@ val dir_ends_with: string -> Dir.t -> bool
 (** Remove a prefix from a file name *)
 val remove_prefix: Dir.t -> t -> string
 
+(** Remove a prefix directory from a directory path *)
 val remove_prefix_dir: Dir.t -> Dir.t -> string
 
 (** Remove a suffix from a filename *)
