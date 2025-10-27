@@ -181,9 +181,17 @@ module V : sig
     (value list, ('a * 'b) OpamFormula.formula) t
 
   (** Environment variable updates syntax *)
+
+  (** Parses path separator (":" or ";") *)
   val separator : (value, separator) t
+
+  (** Parses path format specifiers ("host", "target", "target-quoted", "host-quoted") *)
   val path_format : (value, path_format) t
+
+  (** Parses environment variable binding with resolved paths *)
   val env_binding : (value, (spf_resolved, euok_writeable) env_update) t
+
+  (** Parses environment variable binding with unresolved (variable-containing) paths *)
   val env_binding_unresolved : (value, (spf_unresolved, euok_writeable) env_update) t
 
   val os_constraint : (value, (bool * string) OpamFormula.formula) t
